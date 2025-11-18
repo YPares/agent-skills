@@ -1,0 +1,51 @@
+/* Card Game Template Styles */
+
+Screen {
+    background: $background;
+}
+
+#game-container {
+    height: 100%;
+    width: 100%;
+    layout: vertical;
+}
+
+/* Opponent Area */
+#opponent-area {
+    height: auto;
+    padding: 1 2;
+    background: $surface;
+}
+
+#opponent-label {
+    text-align: center;
+    text-style: bold;
+    color: $text-muted;
+}
+
+#opponent-hand {
+    padding: 1 0;
+}
+
+/* Play Area */
+#play-area {
+    height: 1fr;
+    margin: 1 2;
+}
+
+/* Player Area */
+#player-area {
+    height: auto;
+    padding: 1 2;
+    background: $boost;
+}
+
+#player-label {
+    text-align: center;
+    text-style: bold;
+    color: $text;
+}
+
+#player-hand {
+    padding: 1 0;
+}
