@@ -36,6 +36,9 @@ jj evolog -r <revision>
 # Create new empty change and edit it
 jj new <base>
 
+# Create new empty change WITHOUT editing it (staying on current change)
+jj new --no-edit <base>
+
 # Change commit message
 jj desc -r <revision> -m "Description"
 
@@ -44,17 +47,62 @@ jj show --git
 ```
 
 ### TODO Commit Workflow
-Yves uses empty commits as TODO markers:
 
+Empty commits as TODO markers enable structured development with clear milestones.
+
+#### Basic TODO Pattern
 ```bash
-# Create empty TODO commit ahead without changing working copy
-jj new <parent-of-new-revision> --no-edit -m "[todo] implement feature X"
+# Create empty TODO commit on specified parent(s)
+jj new --no-edit <parent> -m "[todo] implement feature X"
 
-# Work through TODOs by editing the appropriate revision
+# Current working copy stays unchanged, new revision created ahead
+
+# Work through TODOs by editing the revision
 jj edit <todo-revision>
+
+# Clean up abandoned TODOs
+jj abandon <todo-revision>
 ```
 
-This enables structured development with clear milestones.
+**Key insight:** `jj new` always creates revisions based on specified parents, never needs rebase.
+
+#### Advanced: DAG with Parallel Tasks
+
+Create complex dependency graphs by specifying parents directly:
+
+```bash
+# Create linear chain by referencing previous change-id
+jj new --no-edit @ -m "[todo] Task 1: Foundation"
+jj new --no-edit <T1-change-id> -m "[todo] Task 2: Core"
+jj new --no-edit <T2-change-id> -m "[todo] Task 3: Data model"
+
+# Create parallel branches from same parent (Task 3)
+jj new --no-edit <T3-change-id> -m "[todo] Task 4a: Widget A"
+jj new --no-edit <T3-change-id> -m "[todo] Task 4b: Widget B"
+jj new --no-edit <T3-change-id> -m "[todo] Task 4c: Widget C"
+
+# Create merge point with multiple parents
+jj new --no-edit <T4a-change-id> <T4b-change-id> <T4c-change-id> -m "[todo] Task 5: Integration"
+```
+
+**Result:** Task 3 branches into 3 parallel tasks, which merge into Task 5. No rebasing needed!
+
+#### Rebase Operations
+
+Only needed to fix mistakes or reorganize after the fact:
+
+- `jj rebase -s <source> -d <dest>`: Rebase source AND descendants onto dest
+- `jj rebase -r <revset> -d <dest>`: Rebase ONLY matching revisions (doesn't move descendants)
+
+**Common fix pattern:** Created TODOs on wrong parent
+```bash
+# Accidentally created B on @ instead of A
+jj new @ -m "[todo] A"
+jj new @ -m "[todo] B"  # Oops, wanted B to depend on A
+
+# Fix: rebase B onto A
+jj rebase -s <B-change-id> -d <A-change-id>
+```
 
 ### Template System (v0.33+)
 
