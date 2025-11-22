@@ -93,7 +93,13 @@ This skill provides guidance for writing correct Typst code, with emphasis on av
 
 ## Reading contents from a Typst file
 
-Besides compiling, the `typst` CLI command can also run queries against a Typst file with `typst query`, using typst selectors. See [https://typst.app/docs/reference/introspection/query/#command-line-queries](the docs).
+Besides compiling, the `typst` CLI command can also run queries against a Typst file with `typst query`, using Typst selectors,
+and get the result as JSON.
+
+For instance, `typst query the_document.typ "heading.where(level: 1)" | jq ".[].body.text"` will list all the level-1 section titles present in
+the document. Sadly, it will not tell you their exact positions in the file, but Typst file are easy to grep.
+
+See [https://typst.app/docs/reference/introspection/query/#command-line-queries](the online docs about `query`) for more info.
 
 ## Package Usage
 
@@ -103,3 +109,163 @@ When needing specialized functionality:
 3. Consult package documentation for API
 
 **Popular packages**: `cetz` (diagrams), `drafting` (annotations), `tablex` (tables), `codelst` (code listings)
+
+## Working with Templates
+
+Typst Universe hosts many pre-built templates for reports, papers, CVs, presentations, and more. Templates provide complete document styling and structure.
+
+### Finding Templates
+
+- Browse templates: https://typst.app/universe/search/?kind=templates
+- Filter by category: report, paper, thesis, cv, etc.
+- Check the template's documentation for parameters and examples
+
+### Using a Template
+
+1. Import the template: `#import "@preview/template-name:version": *`
+2. Apply it with `#show: template-name.with(param: value, ...)`
+3. Consult template documentation for required and optional parameters
+
+**Example:**
+```typst
+#import "@preview/bubble:0.2.2": *
+
+#show: bubble.with(
+  title: "My Report",
+  subtitle: "A detailed analysis",
+  author: "Your Name",
+  affiliation: "Your Organization",
+  date: datetime.today(),
+  main-color: rgb("#FF6B35"),
+  color-words: ("important", "key", "critical"),
+)
+
+// Your content follows
+= Introduction
+...
+```
+
+**Key differences from packages:**
+- Templates typically use `#show:` to apply styling to the entire document
+- Packages provide functions/components you call explicitly
+- Templates often have a title page and document structure built-in
+
+**Popular templates**: `charged-ieee` (IEEE papers), `bubble` (colorful reports), `modern-cv` (CVs), `polylux` (presentations)
+
+## Bibliographies and Citations
+
+Typst supports citations and bibliographies using BibTeX (.bib) or Hayagriva (.yml) format files.
+
+See [references/bibliography.md](references/bibliography.md)
+
+## Complete Document Structure Patterns
+
+### Academic Paper / Report
+
+```typst
+#set document(
+  title: "Document Title",
+  author: "Your Name",
+  date: auto,
+)
+
+#set page(
+  paper: "a4",
+  margin: (x: 2.5cm, y: 2.5cm),
+  numbering: "1",
+)
+
+#set text(size: 11pt)
+#set par(justify: true)
+#set heading(numbering: "1.")
+
+// Title page
+#align(center)[
+  #text(size: 24pt, weight: "bold")[Document Title]
+
+  #v(1cm)
+  #text(size: 14pt)[Your Name]
+
+  #v(0.5cm)
+  #datetime.today().display()
+]
+
+#pagebreak()
+
+// Table of contents
+#outline(title: "Table of Contents", indent: auto)
+
+#pagebreak()
+
+// Main content
+= Introduction
+Your introduction text...
+
+= Methods
+...
+
+= Results
+...
+
+= Conclusion
+...
+
+#pagebreak()
+
+// Bibliography
+#bibliography("refs.bib", title: "References", style: "ieee")
+```
+
+### Using Templates (Simpler)
+
+```typst
+#import "@preview/charged-ieee:0.1.4": *
+
+#show: ieee.with(
+  title: "Your Paper Title",
+  authors: (
+    (name: "Author One", email: "author1@example.com"),
+    (name: "Author Two", email: "author2@example.com"),
+  ),
+  abstract: [
+    Your abstract text here...
+  ],
+  index-terms: ("keyword1", "keyword2", "keyword3"),
+  bibliography: bibliography("refs.bib"),
+)
+
+// Content starts immediately
+= Introduction
+Your paper content...
+```
+
+## Troubleshooting
+
+### Missing Font Warnings
+
+If you see "unknown font family" warnings, remove the font specification to use system defaults
+
+**Note**: Font warnings don't prevent compilation; the document will use fallback fonts
+
+### Template/Package Not Found
+
+If import fails with "package not found":
+- Verify exact package name and version on Typst Universe
+- Check for typos in `@preview/package:version` syntax
+- Ensure network connectivity (packages download on first use)
+- **Remember**: Typst uses fully qualified imports with specific versions - there's no package cache to update
+
+### Compilation Errors
+
+Common fixes:
+- **"expected content, found ..."**: You're using code where markup is expected - wrap in `#{ }` or use proper syntax
+- **"expected expression, found ..."**: Missing `#` prefix in markup context
+- **"unknown variable"**: Check spelling, ensure imports are correct
+- **Array/dictionary errors**: Review syntax - use `()` for both, dictionaries need `key: value`
+
+### Performance Issues
+
+For large documents:
+- Use `#include "file.typ"` to split into multiple files
+- Compile specific pages: `typst compile doc.typ output.pdf --pages 1-5`
+- Profile compilation (experimental): `typst compile --timings doc.typ`
