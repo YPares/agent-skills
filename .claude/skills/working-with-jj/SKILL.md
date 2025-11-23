@@ -1,6 +1,6 @@
 ---
-name: jj-helper
-description: Expert guidance for using JJ (Jujutsu) version control system. Use when working with JJ operations, revsets, templates, TODO commit workflows, debugging change evolution, or integrating JJ with AI-assisted development. Covers JJ commands, template system, evolog, operations log, and specific JJ workflows.
+name: working-with-jj
+description: Expert guidance for using JJ (Jujutsu) version control system. Use when working with JJ, whatever the subject. Operations, revsets, templates, TODO commit workflows, debugging change evolution, etc. Covers JJ commands, template system, evolog, operations log, and specific JJ workflows.
 ---
 
 # JJ (Jujutsu) Version Control Helper
@@ -224,6 +224,64 @@ JJ is perfect for AI-assisted workflows:
 - **Extensive revsets:**
   - Powerful history queries
   - Precise change selection
+
+## Common Pitfalls & Solutions
+
+### 1. Command Syntax Confusion
+
+**Problem:** `-r` vs `--revisions` inconsistency
+```bash
+jj log -r xyz          # ✅ Correct (short form)
+jj log --revisions xyz # ❌ Error: unexpected argument
+jj desc -r xyz         # ✅ Correct
+jj desc --revisions xyz # ❌ Error: doesn't exist
+```
+
+**Solution:** Always use short form `-r` for consistency. See `references/command-syntax.md` for details.
+
+### 2. Batch Operations on Multiple Revisions
+
+**Problem:** Updating descriptions for multiple revisions
+```bash
+# ❌ Bash syntax errors with complex pipes
+for rev in a b c; do jj log -r $rev | sed 's/old/new/' | jj desc -r $rev --stdin; done
+
+# ✅ Correct: Quote variables, separate commands properly
+for rev in a b c; do
+  jj log -r "$rev" -n1 --no-graph -T description | \
+    sed 's/old/new/' > /tmp/desc_${rev}.txt
+  jj desc -r "$rev" --stdin < /tmp/desc_${rev}.txt
+done
+```
+
+**Best practice:** Use intermediate files for complex transformations. See `references/batch-operations.md`.
+
+### 3. Creating Parallel TODO Branches
+
+**Common mistake:** Forgetting that `jj new` without `--no-edit` moves your working copy
+```bash
+# ❌ Each jj new moves @, creates tangled dependencies
+jj new parent -m "[todo] Task A"
+jj new parent -m "[todo] Task B"  # B is now child of A, not parent!
+
+# ✅ Use --no-edit to keep @ stable
+jj new --no-edit parent -m "[todo] Task A"
+jj new --no-edit parent -m "[todo] Task B"  # Both are children of parent
+```
+
+**Key insight:** `--no-edit` is essential for creating parallel branches. Your working copy (@) stays put.
+
+### 4. Revset Quoting in Shell
+
+**Problem:** Special characters in revsets need proper quoting
+```bash
+# ❌ Shell interprets glob pattern
+jj log -r description(glob:"[todo]*")  # Shell error
+
+# ✅ Proper quoting
+jj log -r 'description(glob:"[todo]*")'
+jj log -r "description(glob:\"[todo]*\")"
+```
 
 ## Troubleshooting
 
