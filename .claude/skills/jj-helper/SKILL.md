@@ -1,37 +1,42 @@
 ---
 name: jj-helper
-description: Expert guidance for using JJ (Jujutsu) version control system. Use when working with JJ operations, revsets, templates, TODO commit workflows, debugging change evolution, or integrating JJ with AI-assisted development. Covers JJ commands, template system, evolog, operations log, and Yves' specific JJ workflows.
+description: Expert guidance for using JJ (Jujutsu) version control system. Use when working with JJ operations, revsets, templates, TODO commit workflows, debugging change evolution, or integrating JJ with AI-assisted development. Covers JJ commands, template system, evolog, operations log, and specific JJ workflows.
 ---
 
 # JJ (Jujutsu) Version Control Helper
 
-Expert guidance for using JJ (Jujutsu) version control system with Yves' workflows.
+Expert guidance for using JJ (Jujutsu) version control system.
 
 ## Core Principles
 
-### Mental Model
 JJ fixes fundamental Git UX issues while maintaining compatibility:
-- **Change IDs** (immutable logical changes) vs **Commit IDs** (content-based hashes)
+
+- **Change IDs** (immutable logical changes) vs **Commit IDs** (content-based
+  hashes)
+- **Commits are just regular Git commits**: a revision (or "change", the two
+  mean the same in JJ lingo) just points to a new commit whenever it is edited:
+  the commit ID changes, the change ID stays the same
 - **Operations log** provides complete safety - every operation can be undone
 - **No staging area** - just working copy and commits
 - **Conflicts don't block work** - can be resolved later
 - **Commits are lightweight** - not "sacred artifacts"
 
-### Safety First
-Every JJ operation is recorded in the operations log:
-- `jj op log` - view operation history
-- `jj op undo` - revert last operation
-- You can experiment fearlessly with JJ
-
 ## Common Operations
 
 ### Basic Workflow
+
+TERMINOLOGY NOTE: "Commit messages" are usually called _"revision descriptions"_ instead in JJ.
+
 ```bash
 # View revision history
-jj log -r <revset>
+jj log -r <revset> -T builtin_log_compact
+# (the user may have a set a custom log template. builtin_log_compact is the default JJ log template)
+
+# View detailed information about one specific revision (incl. git diff)
+jj log -n1 --no-graph -r <revision> -T builtin_log_detailed --git
 
 # Show evolution of a specific change
-jj evolog -r <revision>
+jj evolog -r <revision> --git
 
 # Create new empty change and edit it
 jj new <base>
@@ -39,32 +44,90 @@ jj new <base>
 # Create new empty change WITHOUT editing it (staying on current change)
 jj new --no-edit <base>
 
-# Change commit message
+# Change revision description
 jj desc -r <revision> -m "Description"
-
-# See current work with git diff
-jj show --git
+# ...or feed description to set from stdin
+cmd_that_outputs_description | jj desc -r <revision> --stdin
 ```
 
 ### TODO Commit Workflow
 
-Empty commits as TODO markers enable structured development with clear milestones.
+Empty revisions as TODO markers, with descriptions that act as specification
+of what should be implemented as part of each revisions, enable structured
+development with clear milestones.
 
-#### Basic TODO Pattern
+#### Basic TODO Workflow
+
 ```bash
 # Create empty TODO commit on specified parent(s)
-jj new --no-edit <parent> -m "[todo] implement feature X"
+jj new --no-edit <parent> -m "[todo] implement feature X\n\n<thorough description of what do to at this step>"
+# Current working copy stays unchanged because of --no-edit, new revision is created ahead of parent(s)
 
-# Current working copy stays unchanged, new revision created ahead
+# Work through TODOs by editing each revision:
 
-# Work through TODOs by editing the revision
+## Read the revision description to know what exactly should be done 
+jj log -r <todo-revision> -n1 --no-graph -T description
+## Start editing the revision
 jj edit <todo-revision>
 
-# Clean up abandoned TODOs
-jj abandon <todo-revision>
+# Update status flags as work progresses (using sed pipeline)
+jj log -r @ -n1 --no-graph -T description | sed 's/\[todo\]/[wip]/' | jj desc -r @ --stdin
+jj log -r @ -n1 --no-graph -T description | sed 's/\[wip\]/[untested]/' | jj desc -r @ --stdin
+jj log -r @ -n1 --no-graph -T description | sed 's/\[untested\]//' | jj desc -r @ --stdin
+
+# EVERYTHING IN THE IMPLEMENTATION THAT DIFFERS FROM THE SPECS (STATED IN THE
+# REVISION DESCRIPTION) MUST BE MADE EXPLICIT AS AN "IMPLEMENTATION" ADDENDUM AT THE END
+# OF THE REVISION DESCRIPTION. Edit the description to do so.
 ```
 
-**Key insight:** `jj new` always creates revisions based on specified parents, never needs rebase.
+**Key insight:** `jj new` creates revisions on specified parents directly, no
+rebase needed.
+
+#### Status Flags Convention
+
+Use commit message prefixes to track task status at a glance:
+
+- **`[todo]`** - Not started, empty revision ready to be filled
+- **`[wip]`** - Work in progress, incomplete implementation
+- **`[untested]`** - Implementation done but tests missing or incomplete
+- **`[broken]`** - Tests failing, needs fixing
+- **`[review]`** - Complete but needs review (tricky code, design choice, etc.)
+- **No flag** - Complete, tested, and approved
+
+**Updating flags (recommended approach):**
+
+```bash
+# Get current description, modify, pipe back with --stdin
+jj log -r <change-id> -n1 --no-graph -T description | sed 's/\[todo\]/[wip]/' | jj desc -r <change-id> --stdin
+
+# Common transitions
+[todo] → [wip]:      sed 's/\[todo\]/[wip]/'
+[wip] → [untested]:  sed 's/\[wip\]/[untested]/'
+[wip] → [review]:    sed 's/\[wip\]/[review]/'
+[untested] → done:   sed 's/\[untested\] //'
+[broken] → done:     sed 's/\[broken\] //'
+[review] → done:     sed 's/\[review\] //'
+```
+
+**Finding incomplete work:**
+
+```bash
+# All flagged revisions
+jj log -r 'description(glob:"[*")'
+
+# Specific status
+jj log -r 'description(glob:"[wip]*")'
+jj log -r 'description(glob:"[broken]*")'
+jj log -r 'description(glob:"[review]*")'
+```
+
+**Use cases for `[review]`:**
+
+- Tricky implementation that needs a second look
+- Design choice that requires discussion
+- Code working but architecture debatable
+- Performance concerns to validate
+- Security-sensitive code
 
 #### Advanced: DAG with Parallel Tasks
 
@@ -85,16 +148,19 @@ jj new --no-edit <T3-change-id> -m "[todo] Task 4c: Widget C"
 jj new --no-edit <T4a-change-id> <T4b-change-id> <T4c-change-id> -m "[todo] Task 5: Integration"
 ```
 
-**Result:** Task 3 branches into 3 parallel tasks, which merge into Task 5. No rebasing needed!
+**Result:** Task 3 branches into 3 parallel tasks, which merge into Task 5. No
+rebasing needed!
 
 #### Rebase Operations
 
 Only needed to fix mistakes or reorganize after the fact:
 
 - `jj rebase -s <source> -d <dest>`: Rebase source AND descendants onto dest
-- `jj rebase -r <revset> -d <dest>`: Rebase ONLY matching revisions (doesn't move descendants)
+- `jj rebase -r <revset> -d <dest>`: Rebase ONLY matching revisions (doesn't
+  move descendants)
 
 **Common fix pattern:** Created TODOs on wrong parent
+
 ```bash
 # Accidentally created B on @ instead of A
 jj new @ -m "[todo] A"
@@ -104,17 +170,21 @@ jj new @ -m "[todo] B"  # Oops, wanted B to depend on A
 jj rebase -s <B-change-id> -d <A-change-id>
 ```
 
-### Template System (v0.33+)
+### Template System
 
 **Important context separation:**
+
 - **Log templates**: Use `change_id`, `commit_id` (operating on revision object)
-- **Evolog templates**: Use `commit.change_id()`, `commit.commit_id()` (operating on commit object)
+- **Evolog templates**: Use `commit.change_id()`, `commit.commit_id()`
+  (operating on commit object)
 
 Built-in templates:
+
 - `builtin_log_compact`, `builtin_log_detailed` for log
-- `builtin_evolog_compact` for evolog (v0.33+)
+- `builtin_evolog_compact` for evolog
 
 JSON output for tooling:
+
 ```bash
 # Get structured revision data
 jj log -T "json(self)"
@@ -122,10 +192,6 @@ jj log -T "json(self)"
 # Get commit context in evolog
 jj evolog -T "commit.change_id().shortest(8)"
 ```
-
-Configuration:
-- `templates.log` for log command templates
-- `templates.evolog` for evolog command templates (v0.33+)
 
 ### Revsets
 
@@ -145,57 +211,50 @@ jj log -r "mine() & ::@"              # Your changes in current branch
 
 JJ is perfect for AI-assisted workflows:
 
-1. **Auto-snapshotting with `watch + jj debug snapshot`:**
-   - Every edit (human or AI) preserved in evolog
-   - Perfect audit trail of all changes
-   - Instant rollback capability - let AI experiment safely
-
-2. **Empty TODO commits:**
-   - Structure AI tasks with clear milestones
-   - AI can work through structured development plan
-
-3. **JSON output:**
-   - Robust tooling integration
-   - Parse history programmatically
-
-4. **Extensive revsets:**
-   - Powerful history queries
-   - Precise change selection
-
-## Version-Specific Notes
-
-### Evolog Evolution (v0.33+)
-- **Pre-0.33**: Operation metadata (`-- operation xxx`) auto-appended, breaking template parsing
-- **v0.33+**: Operation metadata fully template-controlled, eliminating parsing issues
-
-If working with pre-0.33 JJ, account for metadata in parsing logic.
+- **Auto-snapshotting with `watchman`:**
+  - Every edit (human or AI) preserved in evolog
+  - Perfect audit trail of all changes
+  - Instant rollback capability - let AI experiment safely
+- **Empty TODO commits:**
+  - Structure AI tasks with clear milestones
+  - AI can work through structured development plan
+- **JSON output:**
+  - Robust tooling integration
+  - Parse history programmatically
+- **Extensive revsets:**
+  - Powerful history queries
+  - Precise change selection
 
 ## Troubleshooting
 
 ### Template Issues
+
 - Use `jj help -k templates` for comprehensive documentation
 - Remember context separation: log vs evolog template syntax differs
 - Test templates with `jj log -T "your_template" -r @` on current revision
 
 ### Operation Recovery
+
 If something goes wrong:
+
 ```bash
 jj op log              # Find the operation before the problem
-jj op undo             # Undo last operation
 jj op restore <op-id>  # Restore to specific operation
 ```
 
+Operation IDs look just like Git commit IDs.
+
 ### Getting Help
+
 ```bash
 jj help -k <keyword>   # Search help by keyword
 jj <command> --help    # Command-specific help
 ```
 
-## Best Practices for Yves' Workflow
+## Best Practices
 
-1. **Always use `jj show --git`** to see current work before committing
-2. **Use TODO commits** for multi-step tasks
-3. **Leverage JSON output** for any scripting/tooling needs
-4. **Don't fear experimentation** - operations log has your back
-5. **Use precise revsets** instead of branch names when possible
-6. **Keep commit messages clear** - they're easy to amend in JJ
+- **Use TODO commits** for multi-step tasks
+- **Leverage JSON output** for any scripting/tooling needs
+- **Don't fear experimentation** - operations log has your back
+- **Use precise revsets** instead of branch names when possible
+- **Keep revision descriptions clear** - they're easy to amend in JJ
