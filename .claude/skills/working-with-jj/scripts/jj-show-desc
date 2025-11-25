@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Get revision description only (for reading or piping)
+# Usage: jj-show-desc [REV]
+# REV defaults to @
+
+set -euo pipefail
+
+rev="${1:-@}"
+jj log -r "$rev" -n1 --no-graph -T description

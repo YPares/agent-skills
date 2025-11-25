@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Create multiple parallel TODO branches from same parent
+# Usage: jj-parallel-todos <PARENT> <TITLE1> <TITLE2> [TITLE3...]
+# Example: jj-parallel-todos @ "Widget A" "Widget B" "Widget C"
+
+set -euo pipefail
+
+if [[ $# -lt 2 ]]; then
+  echo "Usage: jj-parallel-todos <PARENT> <TITLE1> <TITLE2> [TITLE3...]" >&2
+  exit 1
+fi
+
+parent="$1"
+shift
+
+for title in "$@"; do
+  jj new --no-edit "$parent" -m "[todo] ${title}"
+done
+
+echo "✅ Created $# parallel TODO branches from $parent"

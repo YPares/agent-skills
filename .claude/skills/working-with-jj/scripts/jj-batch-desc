@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Apply transformation to multiple revisions
+# Usage: jj-batch-desc <SED_SCRIPT_FILE> <REV1> [REV2...]
+# Example: jj-batch-desc /tmp/replacements.sed abc xyz mno
+
+set -euo pipefail
+
+if [[ $# -lt 2 ]]; then
+  echo "Usage: jj-batch-desc <SED_SCRIPT_FILE> <REV1> [REV2...]" >&2
+  exit 1
+fi
+
+sed_script="$1"
+shift
+
+if [[ ! -f "$sed_script" ]]; then
+  echo "Error: sed script not found: $sed_script" >&2
+  exit 1
+fi
+
+for rev in "$@"; do
+  echo "Processing $rev..."
+  tmpfile="/tmp/jj_desc_${rev}_$$.txt"
+  jj log -r "$rev" -n1 --no-graph -T description > "$tmpfile"
+  sed -f "$sed_script" "$tmpfile" | jj desc -r "$rev" --stdin
+  rm -f "$tmpfile"
+done
+
+echo "✅ Processed $# revision(s)"

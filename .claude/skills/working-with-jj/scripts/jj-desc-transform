@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Transform revision description through a command
+# Usage: jj-desc-transform <REV> <COMMAND...>
+# Example: jj-desc-transform @ sed 's/foo/bar/'
+# Example: jj-desc-transform mxyz awk '/^##/{print; next} {print "  "$0}'
+
+set -euo pipefail
+
+if [[ $# -lt 2 ]]; then
+  echo "Usage: jj-desc-transform <REV> <COMMAND...>" >&2
+  exit 1
+fi
+
+rev="$1"
+shift
+
+jj log -r "$rev" -n1 --no-graph -T description | "$@" | jj desc -r "$rev" --stdin

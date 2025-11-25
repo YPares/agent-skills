@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Update status flag in revision description
+# Usage: jj-flag-update <REV> <FROM_FLAG> <TO_FLAG>
+# FROM_FLAG and TO_FLAG are: todo, wip, untested, broken, review, or "done" (removes flag)
+# Example: jj-flag-update @ todo wip
+# Example: jj-flag-update mxyz wip done
+
+set -euo pipefail
+
+if [[ $# -ne 3 ]]; then
+  echo "Usage: jj-flag-update <REV> <FROM_FLAG> <TO_FLAG>" >&2
+  echo "Flags: todo, wip, untested, broken, review, done (done removes flag)" >&2
+  exit 1
+fi
+
+rev="$1"
+from_flag="$2"
+to_flag="$3"
+
+# Build sed pattern
+if [[ "$to_flag" == "done" ]]; then
+  # Remove the flag (and trailing space)
+  sed_pattern="s/\[${from_flag}\] //"
+else
+  sed_pattern="s/\[${from_flag}\]/[${to_flag}]/"
+fi
+
+jj log -r "$rev" -n1 --no-graph -T description | sed "$sed_pattern" | jj desc -r "$rev" --stdin

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Find revisions with status flags
+# Usage: jj-find-flagged [FLAG]
+# FLAG: todo, wip, untested, broken, review (omit for all flagged)
+
+set -euo pipefail
+
+flag="${1:-}"
+
+if [[ -n "$flag" ]]; then
+  # Use substring match instead of glob for specific flag
+  jj log -r "description(substring:\"[${flag}]\")"
+else
+  # All flagged revisions - match common flags
+  jj log -r 'description(substring:"[todo]") | description(substring:"[wip]") | description(substring:"[untested]") | description(substring:"[broken]") | description(substring:"[review]")'
+fi

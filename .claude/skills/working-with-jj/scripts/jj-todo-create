@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Create empty TODO revision without editing (stays on current @)
+# Usage: jj-todo-create <PARENT> <TITLE> [DESCRIPTION]
+# Example: jj-todo-create @ "implement feature X" "detailed specs here"
+
+set -euo pipefail
+
+if [[ $# -lt 2 ]]; then
+  echo "Usage: jj-todo-create <PARENT> <TITLE> [DESCRIPTION]" >&2
+  exit 1
+fi
+
+parent="$1"
+title="$2"
+description="${3:-}"
+
+if [[ -n "$description" ]]; then
+  msg="[todo] ${title}
+
+${description}"
+else
+  msg="[todo] ${title}"
+fi
+
+jj new --no-edit "$parent" -m "$msg"
