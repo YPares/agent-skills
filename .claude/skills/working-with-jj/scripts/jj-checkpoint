@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Create a named checkpoint before risky operations
+# Usage: jj-checkpoint [NAME]
+# Later restore with: jj op restore <op-id>
+# NAME defaults to "checkpoint"
+
+set -euo pipefail
+
+name="${1:-checkpoint}"
+
+# Get current operation ID
+op_id=$(jj op log -n1 --no-graph -T 'self.id().short(12)')
+
+echo "📍 Checkpoint '$name' at operation: $op_id"
+echo "   Restore with: jj op restore $op_id"
+echo ""
+echo "   Current state:"
+jj log -r @ -n1 -T 'change_id.shortest(8) ++ " " ++ description.first_line()'
