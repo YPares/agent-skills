@@ -238,6 +238,32 @@ Each TODO should be completable in one focused session. If it's too big, split i
 
 When creating TODOs, always use `jj-todo-create` or `jj new --no-edit`. Otherwise @ moves and you lose your place.
 
+### Validate Between Steps
+
+After completing each TODO, run your project's validation (typecheck, lint, tests) before moving to the next:
+
+```bash
+# Complete the TODO
+jj-flag-update @ wip done
+
+# Verify (use your project's commands)
+make check        # or: cargo build, pnpm tsc, go build, etc.
+
+# Then start next TODO
+jj edit <next-todo-id>
+jj-flag-update @ todo wip  # or review, untested etc, depending on what could be completed
+```
+
+This catches errors early when context is fresh, rather than debugging cascading failures at the end.
+
+### Watch for Hidden Dependencies
+
+When planning TODOs that touch service/module layers (especially with dependency injection), dependencies between components may not be obvious until you validate. A component might require a service you're modifying or replacing.
+
+If a later TODO fails due to missing dependencies from an earlier one, don't forget to edit the description to make clear the extra work you had to do which wasn't in the specs.
+
+The upfront planning helps surface these, but some will only appear at validation time.
+
 ### Check DAG Before Starting
 
 ```bash
