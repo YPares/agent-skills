@@ -79,12 +79,22 @@ jj-flag-update @ todo wip
 jj-flag-update @ wip untested
 ```
 
-### 3. Complete: Remove Flag
+### 3. Complete and Move to Next
 
 ```bash
-# After testing passes
-jj-flag-update @ untested done
+# After validation passes, complete current and start next TODO
+jj-todo-done
+
+# If there are multiple next TODOs (parallel branches), it will list them:
+#   Multiple next TODOs available. Choose one:
+#     abc123  [todo] Widget A
+#     def456  [todo] Widget B
+#
+# Then specify which one:
+jj-todo-done abc123
 ```
+
+The script handles the full transition: marks current as done, edits the next revision, sets it to `[wip]`, and prints its description so you can start working.
 
 ## Parallel Tasks (DAG)
 
@@ -243,15 +253,11 @@ When creating TODOs, always use `jj-todo-create` or `jj new --no-edit`. Otherwis
 After completing each TODO, run your project's validation (typecheck, lint, tests) before moving to the next:
 
 ```bash
-# Complete the TODO
-jj-flag-update @ wip done
-
-# Verify (use your project's commands)
+# Verify current work (use your project's commands)
 make check        # or: cargo build, pnpm tsc, go build, etc.
 
-# Then start next TODO
-jj edit <next-todo-id>
-jj-flag-update @ todo wip  # or review, untested etc, depending on what could be completed
+# Then complete and move to next
+jj-todo-done
 ```
 
 This catches errors early when context is fresh, rather than debugging cascading failures at the end.
