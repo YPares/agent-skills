@@ -1,0 +1,30 @@
+{
+  "name": "ypares-agent-skills",
+  "owner": {
+    "name": "Yves Parès",
+    "email": "yves.pares@gmail.com"
+  },
+  "metadata": {
+    "description": "Various skills for AI agents (Claude Skills format)",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "ypares-agent-skills",
+      "description": "Collection of productivity and development skills including GitHub workflow automation, Nix packaging, Textual TUI building, Typst document creation, and Jujutsu VCS workflows",
+      "source": "./",
+      "version": "1.0.0",
+      "homepage": "https://github.com/YPares/agent-skills",
+      "license": "MIT",
+      "keywords": ["github", "nix", "textual", "typst", "jujutsu", "workflow"],
+      "strict": false,
+      "skills": [
+        "./github-pr-workflow",
+        "./package-npm-nix",
+        "./textual-builder",
+        "./typst-writer",
+        "./working-with-jj"
+      ]
+    }
+  ]
+}
