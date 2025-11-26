@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Get a summary of a PR: title, body, state, and review status
+# Usage: gh-pr-summary <PR_NUMBER> [REPO]
+
+set -euo pipefail
+
+PR_NUMBER="${1:?Usage: gh-pr-summary <PR_NUMBER> [REPO]}"
+REPO="${2:-}"
+
+if [[ -z "$REPO" ]]; then
+  REPO=$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null || true)
+  if [[ -z "$REPO" ]]; then
+    echo "Error: Could not detect repo. Provide REPO as second argument" >&2
+    exit 1
+  fi
+fi
+
+gh api "repos/${REPO}/pulls/${PR_NUMBER}" | jq -r '
+"PR #\(.number): \(.title)
+State: \(.state) | Mergeable: \(.mergeable // "unknown") | Draft: \(.draft)
+Author: \(.user.login)
+Branch: \(.head.ref) → \(.base.ref)
+Created: \(.created_at | split("T")[0])
+URL: \(.html_url)
+
+─── Description ───
+\(.body // "(no description)")"'

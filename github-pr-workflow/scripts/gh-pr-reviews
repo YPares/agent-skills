@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Get review decisions (approved, changes_requested, commented) for a PR
+# Usage: gh-pr-reviews <PR_NUMBER> [REPO]
+
+set -euo pipefail
+
+PR_NUMBER="${1:?Usage: gh-pr-reviews <PR_NUMBER> [REPO]}"
+REPO="${2:-}"
+
+if [[ -z "$REPO" ]]; then
+  REPO=$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null || true)
+  if [[ -z "$REPO" ]]; then
+    echo "Error: Could not detect repo. Provide REPO as second argument" >&2
+    exit 1
+  fi
+fi
+
+gh api "repos/${REPO}/pulls/${PR_NUMBER}/reviews" | jq -r '
+  .[] |
+  select(.state != "PENDING") |
+  "\(.user.login): \(.state) (\(.submitted_at | split("T")[0]))\(if .body != "" then "\n  \(.body)" else "" end)"'
