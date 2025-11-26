@@ -83,7 +83,7 @@ Helper scripts in `scripts/`. Add to PATH or invoke directly.
 | `jj-show-detailed [REV]`                  | Detailed info with git diff            |
 | `jj-todo-create <PARENT> <TITLE> [DESC]`  | Create TODO (stays on @)               |
 | `jj-todo-done [NEXT_REV]`                 | Complete current TODO, start next      |
-| `jj-flag-update <REV> <FROM> <TO>`        | Update status flag                     |
+| `jj-flag-update <REV> <TO_FLAG>`          | Update status flag (auto-detects current) |
 | `jj-find-flagged [FLAG]`                  | Find flagged revisions                 |
 | `jj-parallel-todos <PARENT> <T1> <T2>...` | Create parallel TODOs                  |
 | `jj-desc-transform <REV> <CMD...>`        | Pipe description through command       |

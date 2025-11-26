@@ -12,7 +12,7 @@ jj-todo-create @ "Feature X" "Detailed specs of what to implement"
 jj edit <todo-change-id>
 
 # Update status as you progress
-jj-flag-update @ todo wip
+jj-flag-update @ wip
 ```
 
 ## Status Flags
@@ -31,10 +31,10 @@ Use description prefixes to track status at a glance:
 ### Updating Flags
 
 ```bash
-# Using script
-jj-flag-update @ todo wip
-jj-flag-update @ wip untested
-jj-flag-update @ untested done      # "done" removes the flag
+# Using script (auto-detects current flag)
+jj-flag-update @ wip
+jj-flag-update @ untested
+jj-flag-update @ done      # "done" removes the flag
 
 # Manual (what the script does)
 jj log -r @ -n1 --no-graph -T description | sed 's/\[todo\]/[wip]/' | jj desc -r @ --stdin
@@ -71,12 +71,12 @@ jj-show-desc <task-id>
 
 # Start working on it
 jj edit <task-id>
-jj-flag-update @ todo wip
+jj-flag-update @ wip
 
 # ... implement ...
 
 # Mark progress
-jj-flag-update @ wip untested
+jj-flag-update @ untested
 ```
 
 ### 3. Complete and Move to Next
@@ -217,12 +217,12 @@ jj-checkpoint "before-auth-refactor"
 
 # AI edits the revision
 jj edit <todo-id>
-jj-flag-update @ todo wip
+jj-flag-update @ wip
 
 # ... AI implements ...
 
 # AI marks complete
-jj-flag-update @ wip untested
+jj-flag-update @ untested
 ```
 
 ### Review Phase (Human)

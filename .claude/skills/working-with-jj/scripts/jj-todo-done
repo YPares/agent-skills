@@ -13,12 +13,8 @@ set -euo pipefail
 
 SCRIPTS_DIR="$(dirname "$0")"
 
-# Mark current as done
-"$SCRIPTS_DIR/jj-flag-update" @ wip done 2>/dev/null || \
-"$SCRIPTS_DIR/jj-flag-update" @ untested done 2>/dev/null || \
-"$SCRIPTS_DIR/jj-flag-update" @ broken done 2>/dev/null || \
-"$SCRIPTS_DIR/jj-flag-update" @ review done 2>/dev/null || \
-true  # Already done or no flag
+# Mark current as done (auto-detects current flag)
+"$SCRIPTS_DIR/jj-flag-update" @ done
 
 current=$(jj log -r @ --no-graph -T 'change_id.shortest(8)')
 
@@ -29,7 +25,7 @@ if [[ -n "${1:-}" ]]; then
     # User specified next revision
     next="$1"
     jj edit "$next"
-    "$SCRIPTS_DIR/jj-flag-update" @ todo wip
+    "$SCRIPTS_DIR/jj-flag-update" @ wip
     echo ""
     echo "📋 Starting TODO:"
     echo "─────────────────"
@@ -47,7 +43,7 @@ elif [[ $(echo "$children" | wc -l) -eq 1 ]]; then
     echo "✅ Completed: $current"
     echo ""
     jj edit "$next"
-    "$SCRIPTS_DIR/jj-flag-update" @ todo wip
+    "$SCRIPTS_DIR/jj-flag-update" @ wip
     echo ""
     echo "📋 Starting TODO:"
     echo "─────────────────"
