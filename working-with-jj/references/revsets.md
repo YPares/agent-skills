@@ -10,8 +10,8 @@ jj help -k revsets    # Official documentation
 
 ```bash
 @                     # Working copy
-@-                    # Parent of @
-@--                   # Grandparent
+@-                    # Parent(s) of @
+@--                   # Grandparent(s)
 root()                # Root commit (empty ancestor)
 <change-id>           # By change ID (e.g., abc, xyzmno)
 <commit-id>           # By commit hash
@@ -48,8 +48,8 @@ author(substring:"name")        # Match author name/email
 committer(substring:"name")     # Match committer
 
 # File-based
-file("path/to/file")            # Revisions that modified this file
-file("glob:src/*.rs")           # Glob pattern matching
+files("path/to/file")            # Revisions that modified this file
+files(glob:"src/*.rs")           # Glob pattern matching
 ```
 
 ## Set Operations
@@ -83,10 +83,10 @@ mine() ~ ::main
 
 ```bash
 # Changes to a specific file
-file("src/lib.rs")
+files("src/lib.rs")
 
 # Your changes to src/ directory
-file("src/") & mine()
+files("src/") & mine()
 
 # Empty TODO commits
 empty() & description(substring:"[todo]")
@@ -102,7 +102,7 @@ conflict()
 @ | @- | @-- | @---
 
 # All siblings (same parent as @)
-@-:: ~ @::
+@-+ ~ @
 
 # Common ancestor of two revisions
 heads(::A & ::B)

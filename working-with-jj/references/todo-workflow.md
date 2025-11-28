@@ -229,13 +229,10 @@ jj-flag-update @ untested
 
 ```bash
 # Human reviews what AI did
-jj evolog -r <todo-id> --git
+jj log -r <todo-id>
+jj evolog -r <todo-id>
 
-# If bad, restore checkpoint
-jj op restore <checkpoint-op-id>
-
-# If good but needs splitting
-jj split -r <todo-id>
+# ...
 ```
 
 ## Tips

@@ -154,24 +154,22 @@ jj log -T "json(self)" --no-graph
 ### Operation IDs for checkpoints
 
 ```bash
-jj op log -T 'self.id().short(12) ++ " " ++ self.description() ++ "\n"' --no-graph -n5
+jj op log -T 'id.short(12) ++ " " ++ description ++ "\n"' --no-graph -n5
 ```
 
 ## Config File Templates
 
-Define reusable templates in `~/.jjconfig.toml`:
+Define reusable templates in TOML file:
 
 ```toml
-[templates]
-log = 'change_id.shortest(8) ++ " " ++ description.first_line()'
-
 [template-aliases]
 'format_short_id(id)' = 'id.shortest(8)'
+mylog = 'format_short_id(change_id) ++ " " ++ description.first_line()'
 ```
 
 Then use with:
 
 ```bash
-jj log -T log
+jj log -T mylog --config-file path/to/config.toml
 # or reference alias in other templates
 ```

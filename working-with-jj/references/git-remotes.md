@@ -69,7 +69,7 @@ jj bookmark set main -r 'main@origin'
 ```bash
 jj git push --bookmark <name>           # Push specific bookmark
 jj git push --all                       # Push all bookmarks
-jj git push --change <rev>              # Create/push bookmark for revision
+jj git push --change <rev>              # Create and push bookmark for revision
 ```
 
 ### Push Errors
@@ -82,11 +82,10 @@ jj rebase -d 'main@origin'
 jj git push --bookmark my-feature
 ```
 
-**"would delete remote bookmark"**: Remote has bookmark you don't. Either:
+**"would delete remote bookmark"**: Remote has bookmark you don't:
 
 ```bash
-jj git push --bookmark <name> --allow-delete   # Delete remote
-# or
+jj git fetch
 jj bookmark track <name>@origin                # Keep tracking it
 ```
 
@@ -107,12 +106,12 @@ jj rebase -d 'main@origin'
 
 ```bash
 jj git clone <url> [path]               # Clone Git repo into JJ
-jj git clone --colocate <url>           # Colocated: .git + .jj together
 ```
 
 ### Colocated Repos
 
-Colocated repos have both `.git` and `.jj` at the root. Git and JJ see the same history.
+Colocated repos have both `.git` and `.jj` at the root (this is the default).
+Git and JJ see the same history.
 
 ```bash
 # Convert existing Git repo to colocated JJ

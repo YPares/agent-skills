@@ -20,19 +20,16 @@ description: Expert guidance for using JJ (Jujutsu) version control system. Use 
 jj log -r <revset>                    # View history
 jj evolog -r <rev> --git              # Change evolution (with diffs)
 jj new <base>                         # Create revision and edit it
-jj new --no-edit <base>               # Create without switching (for TODOs)
+jj new --no-edit <base>               # Create without switching (e.g. to add somewhere an empty TODO task for later)
 jj edit <rev>                         # Switch to editing revision
 jj desc -r <rev> -m "text"            # Set description
 
 jj diff                               # Changes in @
 jj diff -r <rev>                      # Changes in revision
 jj restore <path>                     # Discard changes to file
-jj restore --from <rev> <path>        # Restore from another revision
+jj restore --from <commit-id> <paths...> # Restore from another revision/commit, a previous state (commit) of the current revision, etc.
 
-jj split -r <rev>                     # Split into multiple commits
-jj squash                             # Squash @ into parent
-jj squash --into <dest>               # Squash @ into specific revision
-jj absorb                             # Auto-squash into right ancestors
+jj split -r <rev> <paths...> -m "text" # Split <rev> into two revisions, by giving a message for the first revision, and which changes (based on filepaths) should go into it
 
 jj rebase -s <src> -d <dest>          # Rebase with descendants
 jj rebase -r <rev> -d <dest>          # Rebase single revision only
@@ -41,8 +38,9 @@ jj rebase -r <rev> -d <dest>          # Rebase single revision only
 ## Quick Revset Reference
 
 ```bash
-@, @-, @--                            # Working copy, parent, grandparent
+@, @-, @--                            # Working copy, parent(s), grandparent(s)
 ::@                                   # Ancestors
+@::                                   # Descendants
 mine()                                # Your changes
 conflict()                            # Has conflicts
 description(substring:"text")         # Match description
@@ -63,7 +61,7 @@ jj log --revisions xyz # ❌
 ### 2. Use `--no-edit` for parallel branches
 
 ```bash
-jj new parent -m "A"; jj new parent -m "B"           # ❌ B is child of A!
+jj new parent -m "A"; jj new -m "B"                             # ❌ B is child of A!
 jj new --no-edit parent -m "A"; jj new --no-edit parent -m "B"  # ✅ Both children of parent
 ```
 
@@ -82,23 +80,23 @@ Helper scripts in `scripts/`. Add to PATH or invoke directly.
 | `jj-show-desc [REV]`                      | Get description only                   |
 | `jj-show-detailed [REV]`                  | Detailed info with git diff            |
 | `jj-todo-create <PARENT> <TITLE> [DESC]`  | Create TODO (stays on @)               |
+| `jj-parallel-todos <PARENT> <T1> <T2>...` | Create parallel TODOs                  |
 | `jj-todo-done [NEXT_REV]`                 | Complete current TODO, start next      |
 | `jj-flag-update <REV> <TO_FLAG>`          | Update status flag (auto-detects current) |
 | `jj-find-flagged [FLAG]`                  | Find flagged revisions                 |
-| `jj-parallel-todos <PARENT> <T1> <T2>...` | Create parallel TODOs                  |
 | `jj-desc-transform <REV> <CMD...>`        | Pipe description through command       |
 | `jj-batch-desc <SED_FILE> <REV...>`       | Batch transform descriptions           |
 | `jj-checkpoint [NAME]`                    | Record op ID before risky operations   |
 
-These scripts are notably useful if you are working using a _"TODO Commit
-Workflow"_: see `references/todo-workflow.md` for structured TODO planning,
+These scripts are notably useful if you are working using a _TODO Commit
+Workflow_: see `references/todo-workflow.md` for structured TODO planning,
 parallel task DAGs, and AI-assisted workflows.
 
 ## Recovery
 
 ```bash
 jj op log              # Find operation before problem
-jj op restore <op-id>  # Restore to that state
+jj op restore <op-id>  # Restore the WHOLE repository (history included) to that state
 ```
 
 ## References
