@@ -14,7 +14,8 @@ jj rebase -r <revset>     # ✅ Short form only
 jj edit -r <revset>       # ✅ Short form only (no --revision)
 ```
 
-**Rule:** For most commands, use `-r` and **never** `--revisions` or `--revision`.
+**Rule:** For most commands, use `-r` and **never** `--revisions` or
+`--revision`.
 
 ### Why This Matters
 
@@ -47,6 +48,7 @@ jj log -r <rev> -T 'change_id.shortest(4) ++ " " ++ description.first_line()'
 ```
 
 **Key flags:**
+
 - `-n1`: Limit to 1 revision
 - `--no-graph`: No ASCII art graph
 - `-T <template>`: Output template
@@ -86,6 +88,7 @@ jj new --no-edit <parent1> <parent2> -m "Merge point"
 ```
 
 **Critical distinction:**
+
 - Without `--no-edit`: Your working copy (@) moves to the new revision
 - With `--no-edit`: New revision created, but @ stays where it was
 
@@ -200,12 +203,12 @@ jj log -r '<parent>::' -T builtin_log_compact
 
 ## Quick Reference Card
 
-| Task | Command |
-|------|---------|
+| Task             | Command                                         |
+| ---------------- | ----------------------------------------------- |
 | View description | `jj log -r <rev> -n1 --no-graph -T description` |
-| Set description | `jj desc -r <rev> -m "text"` |
-| Set from stdin | `jj desc -r <rev> --stdin` |
-| Create (edit) | `jj new <parent> -m "text"` |
-| Create (no edit) | `jj new --no-edit <parent> -m "text"` |
-| Range query | `jj log -r '<from>::<to>'` |
-| Find pattern | `jj log -r 'description(glob:"pat*")'` |
+| Set description  | `jj desc -r <rev> -m "text"`                    |
+| Set from stdin   | `jj desc -r <rev> --stdin`                      |
+| Create (edit)    | `jj new <parent> -m "text"`                     |
+| Create (no edit) | `jj new --no-edit <parent> -m "text"`           |
+| Range query      | `jj log -r '<from>::<to>'`                      |
+| Find pattern     | `jj log -r 'description(glob:"pat*")'`          |

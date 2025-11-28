@@ -1,6 +1,13 @@
-# TODO Commit Workflow
+---
+name: jj-todo-workflow
+description: Structured TODO commit workflow using JJ (Jujutsu). Use when planning tasks as empty commits, tracking progress with status flags, managing parallel task DAGs, or AI-assisted development workflows. Requires the working-with-jj skill.
+---
 
-Empty revisions as TODO markers enable structured development with clear milestones. Descriptions act as specifications for what to implement.
+# JJ TODO Commit Workflow
+
+Use empty revisions as TODO markers to enable structured development with clear milestones. Descriptions (i.e. commit messages) act as specifications for what to implement.
+
+**For more info on JJ basics, see the `working-with-jj` skill.**
 
 ## Core Concept
 
@@ -67,8 +74,8 @@ jj-todo-create <T3-id> "Task 4: Write tests"
 
 ```bash
 # Read the specs
-jj-show-desc <task-id>
-
+jj-show-desc <task-id>    # Script from the `working-with-jj` skill
+ 
 # Start working on it
 jj edit <task-id>
 jj-flag-update @ wip
@@ -212,9 +219,6 @@ jj-todo-create @ "Refactor auth module" "
 # AI reads the task
 jj-show-desc <todo-id>
 
-# AI checkpoints before starting
-jj-checkpoint "before-auth-refactor"
-
 # AI edits the revision
 jj edit <todo-id>
 jj-flag-update @ wip
@@ -289,3 +293,21 @@ jj rebase -r <B-id> -d <C-id>
 # If a TODO is no longer needed
 jj abandon <todo-id>
 ```
+
+## Helper Scripts
+
+Helper scripts in `scripts/`. Add to PATH or invoke directly.
+
+| Script | Purpose |
+| ------ | ------- |
+| `jj-todo-create <PARENT> <TITLE> [DESC]` | Create TODO (stays on @) |
+| `jj-parallel-todos <PARENT> <T1> <T2>...` | Create parallel TODOs |
+| `jj-todo-done [NEXT_REV]` | Complete current TODO, start next |
+| `jj-flag-update <REV> <TO_FLAG>` | Update status flag (auto-detects current) |
+| `jj-find-flagged [FLAG]` | Find flagged revisions |
+
+**Additional useful scripts from the `working-with-jj` skill:**
+
+| Script | Purpose |
+| ------ | ------- |
+| `jj-show-desc [REV]` | Get description of a revision |

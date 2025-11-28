@@ -1,6 +1,6 @@
 ---
 name: working-with-jj
-description: Expert guidance for using JJ (Jujutsu) version control system. Use when working with JJ, whatever the subject. Operations, revsets, templates, TODO commit workflows, debugging change evolution, etc. Covers JJ commands, template system, evolog, operations log, and specific JJ workflows.
+description: Expert guidance for using JJ (Jujutsu) version control system. Use when working with JJ, whatever the subject. Operations, revsets, templates, debugging change evolution, etc. Covers JJ commands, template system, evolog, operations log, and interoperability with git remotes.
 ---
 
 # JJ (Jujutsu) Version Control Helper
@@ -79,18 +79,9 @@ Helper scripts in `scripts/`. Add to PATH or invoke directly.
 | ----------------------------------------- | -------------------------------------- |
 | `jj-show-desc [REV]`                      | Get description only                   |
 | `jj-show-detailed [REV]`                  | Detailed info with git diff            |
-| `jj-todo-create <PARENT> <TITLE> [DESC]`  | Create TODO (stays on @)               |
-| `jj-parallel-todos <PARENT> <T1> <T2>...` | Create parallel TODOs                  |
-| `jj-todo-done [NEXT_REV]`                 | Complete current TODO, start next      |
-| `jj-flag-update <REV> <TO_FLAG>`          | Update status flag (auto-detects current) |
-| `jj-find-flagged [FLAG]`                  | Find flagged revisions                 |
 | `jj-desc-transform <REV> <CMD...>`        | Pipe description through command       |
 | `jj-batch-desc <SED_FILE> <REV...>`       | Batch transform descriptions           |
 | `jj-checkpoint [NAME]`                    | Record op ID before risky operations   |
-
-These scripts are notably useful if you are working using a _TODO Commit
-Workflow_: see `references/todo-workflow.md` for structured TODO planning,
-parallel task DAGs, and AI-assisted workflows.
 
 ## Recovery
 
@@ -101,8 +92,6 @@ jj op restore <op-id>  # Restore the WHOLE repository (history included) to that
 
 ## References
 
-- `references/todo-workflow.md` - Structured TODO planning, parallel DAGs, AI
-  workflows
 - `references/revsets.md` - Full revset syntax and patterns
 - `references/templates.md` - Template language and custom output
 - `references/git-remotes.md` - Bookmarks, push/fetch, remote workflows

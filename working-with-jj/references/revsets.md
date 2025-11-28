@@ -88,7 +88,7 @@ files("src/lib.rs")
 # Your changes to src/ directory
 files("src/") & mine()
 
-# Empty TODO commits
+# Empty commits whose description contains "[todo]"
 empty() & description(substring:"[todo]")
 
 # Commits with conflicts
