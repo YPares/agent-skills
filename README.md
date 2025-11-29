@@ -41,4 +41,8 @@ JJ_CONFIG=/abs/path/to/agent-jj-config.toml claude ...
 This way your agent will use vanilla JJ, with default templates etc. Pretty
 useful if you have a heavily templated `jj log` that the agent is not used to.
 
-(The `just claude` recipe in the `.justfile` here does just that)
+(The `just claude` recipe in the [`.justfile`](.justfile) does just that)
+
+### nix-profile-manager
+
+Also see the `just claude` recipe in the [`.justfile`](.justfile).

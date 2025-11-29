@@ -20,10 +20,12 @@
       "strict": false,
       "skills": [
         "./github-pr-workflow",
+        "./nix-profile-manager",
         "./package-npm-nix",
         "./textual-builder",
         "./typst-writer",
-        "./working-with-jj"
+        "./working-with-jj",
+        "./jj-todo-workflow"
       ]
     }
   ]
