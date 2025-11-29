@@ -17,7 +17,7 @@ if [[ -z "${1:-}" ]]; then
     # No argument provided - remind of specs and show next options
     echo "📋 REVIEW the current TODO specs to make sure everything is implemented as required:"
     echo "─────────────────────"
-    "$SCRIPTS_DIR/jj-show-desc" @
+    jj -r @ --no-graph -T "description"
     echo "─────────────────────"
     echo ""
 
@@ -54,5 +54,5 @@ else
     echo ""
     echo "📋 Now starting to work on $next:"
     echo "─────────────────"
-    "$SCRIPTS_DIR/jj-show-desc" @
+    jj -r @ --no-graph -T "description"
 fi

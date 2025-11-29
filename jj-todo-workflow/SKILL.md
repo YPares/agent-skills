@@ -7,7 +7,7 @@ description: Structured TODO commit workflow using JJ (Jujutsu). Use when planni
 
 Use empty revisions as TODO markers to enable structured development with clear milestones. Descriptions (i.e. commit messages) act as specifications for what to implement.
 
-**For more info on JJ basics, see the `working-with-jj` skill.**
+**For more info on JJ basics, see the `working-with-jj` skill. We reuse scripts from that skill here.**
 
 ## Core Concept
 
@@ -74,7 +74,7 @@ jj-todo-create <T3-id> "Task 4: Write tests"
 
 ```bash
 # Read the specs
-jj-show-desc <task-id>    # Script from the `working-with-jj` skill
+jj-show-desc <task-id>    # BEWARE: Script from the `working-with-jj` skill
  
 # Start working on it
 jj edit <task-id>
