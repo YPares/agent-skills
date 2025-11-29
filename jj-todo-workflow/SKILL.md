@@ -89,19 +89,23 @@ jj-flag-update @ untested
 ### 3. Complete and Move to Next
 
 ```bash
-# After validation passes, complete current and start next TODO
+# First, review the current task specs
 jj-todo-done
 
-# If there are multiple next TODOs (parallel branches), it will list them:
-#   Multiple next TODOs available. Choose one:
-#     abc123  [todo] Widget A
-#     def456  [todo] Widget B
+# Shows the current task's specs and lists available next TODOs:
+#   📋 Current TODO Specs:
+#   [todo] Widget A
+#   ... details ...
 #
-# Then specify which one:
+#   Next TODOs available:
+#     abc123  [todo] Feature B
+#     def456  [todo] Feature C
+
+# When ready, specify which to work on next:
 jj-todo-done abc123
 ```
 
-The script handles the full transition: marks current as done, edits the next revision, sets it to `[wip]`, and prints its description so you can start working.
+The script enforces an explicit workflow: first remind you of what you were supposed to implement, then require you to explicitly choose the next task. This prevents accidentally skipping important specs.
 
 ## Parallel Tasks (DAG)
 
@@ -302,7 +306,7 @@ Helper scripts in `scripts/`. Add to PATH or invoke directly.
 | ------ | ------- |
 | `jj-todo-create <PARENT> <TITLE> [DESC]` | Create TODO (stays on @) |
 | `jj-parallel-todos <PARENT> <T1> <T2>...` | Create parallel TODOs |
-| `jj-todo-done [NEXT_REV]` | Complete current TODO, start next |
+| `jj-todo-done [NEXT_REV]` | Review specs (no arg) or complete+start next (with revision) |
 | `jj-flag-update <REV> <TO_FLAG>` | Update status flag (auto-detects current) |
 | `jj-find-flagged [FLAG]` | Find flagged revisions |
 

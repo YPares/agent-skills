@@ -1,64 +1,58 @@
 #!/usr/bin/env bash
-# Complete current TODO and optionally start the next one
+# Complete current TODO and start the next one
 # Usage: jj-todo-done [NEXT_REV]
 #
-# If NEXT_REV is provided, starts working on that revision.
-# If not provided, lists possible next TODOs (children of current) and exits.
+# NEXT_REV is required to actually move to the next task.
+# If not provided, shows the current task's specs and lists possible next TODOs.
 #
 # Example:
-#   jj-todo-done           # Complete current, show next options
-#   jj-todo-done abc123    # Complete current, start working on abc123
+#   jj-todo-done         # Show specs of current as reminder and list next options
+#   jj-todo-done abc123  # Mark current done, start working on abc123
 
 set -euo pipefail
 
 SCRIPTS_DIR="$(dirname "$0")"
 
-# Mark current as done (auto-detects current flag)
-"$SCRIPTS_DIR/jj-flag-update" @ done
-
-current=$(jj log -r @ --no-graph -T 'change_id.shortest(8)')
-
-# Find children that are TODOs (have any flag)
-children=$(jj log -r "children(@) & description(substring:\"[todo]\")" --no-graph -T 'change_id.shortest(8) ++ "\n"' 2>/dev/null || true)
-
-if [[ -n "${1:-}" ]]; then
-    # User specified next revision
-    next="$1"
-    jj edit "$next"
-    "$SCRIPTS_DIR/jj-flag-update" @ wip
-    echo ""
-    echo "📋 Starting TODO:"
-    echo "─────────────────"
+if [[ -z "${1:-}" ]]; then
+    # No argument provided - remind of specs and show next options
+    echo "📋 REVIEW the current TODO specs to make sure everything is implemented as required:"
+    echo "─────────────────────"
     "$SCRIPTS_DIR/jj-show-desc" @
-elif [[ -z "$children" ]]; then
-    echo "✅ Completed: $current"
+    echo "─────────────────────"
     echo ""
-    echo "No pending TODO children found. You may be done with this chain!"
-    echo ""
-    echo "Check remaining TODOs with:"
-    echo "  jj-find-flagged todo"
-elif [[ $(echo "$children" | wc -l) -eq 1 ]]; then
-    # Single child - start it automatically
-    next=$(echo "$children" | tr -d '[:space:]')
-    echo "✅ Completed: $current"
-    echo ""
-    jj edit "$next"
-    "$SCRIPTS_DIR/jj-flag-update" @ wip
-    echo ""
-    echo "📋 Starting TODO:"
-    echo "─────────────────"
-    "$SCRIPTS_DIR/jj-show-desc" @
+
+    # Find children that are TODOs
+    children="$(jj log -r "children(@) & description(substring:\"[todo]\")" --no-graph -T 'change_id.shortest(8) ++ "\n"')"
+
+    if [[ -z "$children" ]]; then
+        echo "No pending TODO children found. You may be done with this chain!"
+        echo "Check remaining TODOs with: jj-find-flagged todo"
+    else
+        echo "Next TODOs available:"
+        echo ""
+        while IFS= read -r child; do
+            [[ -z "$child" ]] && continue
+            title="$(jj log -r "$child" --no-graph -T 'description.first_line()')"
+            echo "  $child  $title"
+        done <<< "$children"
+        echo ""
+        echo "ONCE YOU ARE READY TO MOVE ON TO ANOTHER TASK, run again with the ID of the next TODO to start: jj-todo-done <change-id>"
+    fi
 else
-    # Multiple children - list them for user to choose
+    # Use specified next revision - complete current and start next
+    next="$1"
+
+    # Mark current as done
+    "$SCRIPTS_DIR/jj-flag-update" @ done
+
+    current=$(jj log -r @ --no-graph -T 'change_id.shortest(8)')
+
+    jj edit "$next"
+    "$SCRIPTS_DIR/jj-flag-update" @ wip
+    echo ""
     echo "✅ Completed: $current"
     echo ""
-    echo "Multiple next TODOs available. Choose one:"
-    echo ""
-    while IFS= read -r child; do
-        [[ -z "$child" ]] && continue
-        title=$(jj log -r "$child" --no-graph -T 'description.first_line()' 2>/dev/null || echo "(no description)")
-        echo "  $child  $title"
-    done <<< "$children"
-    echo ""
-    echo "Run: jj-todo-done <change-id>"
+    echo "📋 Now starting to work on $next:"
+    echo "─────────────────"
+    "$SCRIPTS_DIR/jj-show-desc" @
 fi
