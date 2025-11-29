@@ -43,6 +43,22 @@ useful if you have a heavily templated `jj log` that the agent is not used to.
 
 (The `just claude` recipe in the [`justfile`](./justfile) does just that)
 
+### EDITOR
+
+To prevent Claude from trying to open your interactive EDITOR (e.g. to
+edit commit messages), you can set `$EDITOR` to a dummy script like [this
+one](.agent-space/fake-editor.sh).
+
+**IMPORTANT:** If your `.bashrc`, `.profile` etc. set the `$EDITOR` env var,
+remember the agent runs commands in a shell that **sources** these files,
+so you want them to set `$EDITOR` ONLY if it does not exist already:
+
+```bash
+export EDITOR=${EDITOR:-vim}
+```
+
+instead of just `EDITOR=vim`.
+
 ### nix-profile-manager
 
 Also see the `just claude` recipe in the [`justfile`](./justfile).
