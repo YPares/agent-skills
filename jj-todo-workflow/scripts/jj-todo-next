@@ -53,7 +53,7 @@ if [[ -z "$next_rev" ]]; then
         echo "Current task status: [task:$current_flag]"
         echo "- Mark as [task:done] only if FULLY COMPLIANT with specs above"
         echo "- Keep working on current task if something is left to do"
-        echo "- Remember that divergences with the specs MUST be documented (edit  description to add Post-Implementation notes)"
+        echo "- Remember that divergences with the specs MUST be documented (edit description to add Post-Implementation notes)"
         echo ""
     fi
 
@@ -178,14 +178,14 @@ fi
 
 # NOW we mark current and move
 # This is atomic - only update flag when we're actually transitioning
+current=$(jj log -r @ --no-graph -T 'change_id.shortest(8)')
+
 if [[ -n "$current_flag" ]]; then
     "$SCRIPTS_DIR/jj-flag-update" @ "$mark_as"
     echo "✅ Marked $current as [task:$mark_as]"
 else
     echo "⚠️ Current revision has no [task:*] flag to change**"
 fi
-
-current=$(jj log -r @ --no-graph -T 'change_id.shortest(8)')
 
 # Move to next and mark as wip
 jj edit "$next_rev"

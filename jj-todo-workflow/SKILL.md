@@ -3,7 +3,7 @@ name: jj-todo-workflow
 description: Structured TODO commit workflow using JJ (Jujutsu). Use when planning tasks as empty commits with [task:*] flags, tracking progress through status transitions, managing parallel task DAGs with dependency checking, or AI-assisted development workflows. Enforces completion discipline. Requires the working-with-jj skill.
 ---
 
-# JJ TODO Commit Workflow
+# JJ TODO Workflow
 
 Use empty revisions as TODO markers to enable structured development with clear milestones. Descriptions (i.e. commit messages) act as specifications for what to implement.
 
@@ -28,19 +28,17 @@ jj-flag-update @ wip   # Now [task:wip]
 # ... implement validation ...
 
 # 3. Verify ALL acceptance criteria met
-make test
+make test  # Or equivalent in your project
 
 # 4. Ask to move to next task
 jj-todo-next
-### ... re-prints current specs out (to ensure compliance) and next possible TODOs ...
+### ... review current specs (to ensure compliance) and next possible TODOs ...
 
 # 4. Once we're sure everything is properly done, move to next TODO
 jj-todo-next --mark-as done def456   # Marks abc123 as [task:done], starts def456 as [task:wip]
-
-### ... etc
 ```
 
-**That's it!** Empty commits as specs, edit to work on them, `jj-todo-next --mark-as done` when FULLY complete.
+**That's it!** Empty commits as specs, edit to work on them, `jj-todo-next --mark-as done <next-step>` when FULLY complete.
 
 ## Status Flags
 
@@ -59,13 +57,9 @@ We use description prefixes to track status at a glance. The `[task:*]` namespac
 ### Updating Flags
 
 ```bash
-# Using script
 jj-flag-update @ wip
 jj-flag-update @ untested
 jj-flag-update @ done
-
-# Manual (what the script does)
-jj log -r @ -n1 --no-graph -T description | sed 's/\[task:todo\]/[task:wip]/' | jj desc -r @ --stdin
 ```
 
 ### Finding Flagged Revisions
@@ -182,8 +176,6 @@ jj new --no-edit <A-id> <B-id> <C-id> -m "[task:todo] Integration of widgets\n\n
 
 No rebasing needed - parents specified directly!
 
-**Important:** `jj-todo-next` checks dependencies (ie. parent tasks). It will warn if you try to start Integration before all parent tasks reach `[task:done]`.
-
 ## Writing Good TODO Descriptions
 
 ### Structure
@@ -262,13 +254,33 @@ jj desc -r @ -m "$(jj-show-desc @)
 
 This creates an audit trail of decisions.
 
+## When to Stop and Report
+
+**Follow the prescribed workflow only.**
+If you encounter any issues, STOP and report to the user, notably if:
+- Made changes in wrong revision
+- Need to undo or modify previous work
+- Uncertain about how to proceed
+- Dependencies or requirements unclear
+
+**DO NOT attempt to fix issues using any JJ operation not explicitly present in this workflow.**
+Let the user handle recovery operations. Your job is to follow the process or report when you can't.
+
 ## AI-Assisted TODO Workflow
 
 TODOs work great with AI assistants:
 
 - Human or Supervisor Agent does the initial planning and creates the graph of TODO revisions
-- Worker Agent(s) just "run" through the graph, following the structure and requirements, implementing each revision
-- Humain or Supervisor Agent can review the diffs and notes, and switch back tasks to e.g. `[todo:wip]` when necessary
+- Worker Agent(s) just "run" through the graph, following the structure and requirements, implementing each revision **sequentially**
+- Human or Supervisor Agent can review the diffs and notes, and switch back tasks to e.g. `[todo:wip]` when necessary
+
+**IMPORTANT: Worker agents MUST work sequentially through tasks, not in parallel.**
+Running multiple agents concurrently on the same repository causes conflicts as they fight over the working copy (`@`).
+
+If parallel work is truly needed, you must use JJ workspaces (equivalent to git worktrees) to isolate each agent.
+However, **do not create workspaces** unless the human user explicitly agrees to it, as it adds significant complexity.
+
+See `references/parallel-agents.md` for detailed guide on using workspaces for parallel execution.
 
 ## Tips
 
@@ -324,7 +336,7 @@ jj log -r '::<rev-id>'
 jj log -r '<rev-id>::'
 ```
 
-**Note:** `jj-todo-next` checks dependencies automatically, but it's just here to smooth things out, not to abstract from `jj`. Inspect the graph yourself when planning complex work.
+**Note:** `jj-todo-next` checks dependencies automatically to indicate which children tasks aren't ready, but it's just here to smooth things out, not to abstract from `jj`. Inspect the graph yourself with `jj log` whenever needed.
 
 ## Helper Scripts
 
@@ -343,3 +355,9 @@ Helper scripts in `scripts/`. Invoke with full path to avoid PATH setup.
 | Script | Purpose |
 | ------ | ------- |
 | `jj-show-desc [REV]` | Get description of a revision |
+
+## References
+
+Advanced topics and detailed guides:
+
+- `references/parallel-agents.md` - Using JJ workspaces for parallel agent execution
