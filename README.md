@@ -22,42 +22,19 @@ Nix-packaged in [nix-ai-tools](https://github.com/numtide/nix-ai-tools).
 
 ### working-with-jj
 
-Did you know your agent can have its own jj config?
+Did you know your agent can have its own jj config? This can be useful to ensure:
 
-Just create some `agent-jj-config.toml`:
+- It sees regular git diffs (instead of the more compact jj `color-words` default diff formatter which it isn't used to)
+- It uses the default and more usual `builtin_log_compact` template instead of your custom log template
+- It does not try to use your `$EDITOR`
 
-```toml
-[user]
-name = "Claude"
-email = "claude@clau.de"
-```
-
-and then start the harness (e.g. claude-code) with:
+See [`this file`](.agent-space/jj-config.toml) as an example. You can just start the harness (e.g. claude-code) with:
 
 ```sh
-JJ_CONFIG=/abs/path/to/agent-jj-config.toml claude ...
+JJ_CONFIG=/abs/path/to/agent/jj-config.toml claude ...
 ```
 
-This way your agent will use vanilla JJ, with default templates etc. Pretty
-useful if you have a heavily templated `jj log` that the agent is not used to.
-
-(The `just claude` recipe in the [`justfile`](./justfile) does just that)
-
-### EDITOR
-
-To prevent Claude from trying to open your interactive EDITOR (e.g. to
-edit commit messages), you can set `$EDITOR` to a dummy script like [this
-one](.agent-space/fake-editor.sh).
-
-**IMPORTANT:** If your `.bashrc`, `.profile` etc. set the `$EDITOR` env var,
-remember the agent runs commands in a shell that **sources** these files,
-so you want them to set `$EDITOR` ONLY if it does not exist already:
-
-```bash
-export EDITOR=${EDITOR:-vim}
-```
-
-instead of just `EDITOR=vim`.
+(The `just claude` recipe in the [`justfile`](./justfile) does that)
 
 ### nix-profile-manager
 

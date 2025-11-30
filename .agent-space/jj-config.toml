@@ -1,3 +1,8 @@
 [user]
 name = "Claude"
 email = "claude@clau.de"
+
+[ui]
+# A fake editor with some explicit name your agent will see in the JJ error output:
+editor = "TRIED_TO_RUN_AN_INTERACTIVE_EDITOR"
+diff-formatter = ":git"
