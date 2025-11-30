@@ -1,6 +1,6 @@
 ---
 name: jj-todo-workflow
-description: Structured TODO commit workflow using JJ (Jujutsu). Use when planning tasks as empty commits, tracking progress with status flags, managing parallel task DAGs, or AI-assisted development workflows. Requires the working-with-jj skill.
+description: Structured TODO commit workflow using JJ (Jujutsu). Use when planning tasks as empty commits with [task:*] flags, tracking progress through status transitions, managing parallel task DAGs with dependency checking, or AI-assisted development workflows. Enforces completion discipline. Requires the working-with-jj skill.
 ---
 
 # JJ TODO Commit Workflow
@@ -9,53 +9,78 @@ Use empty revisions as TODO markers to enable structured development with clear 
 
 **For more info on JJ basics, see the `working-with-jj` skill. We reuse scripts from that skill here.**
 
-## Core Concept
+## Quick Start
+
+Here's a complete cycle from planning to completion (**full paths to helper scripts not written**):
 
 ```bash
-# Create empty TODO (stays on current @)
-jj-todo-create @ "Feature X" "Detailed specs of what to implement"
+# 1. Plan: Create a simple TODO chain
+jj-todo-create @ "Add user validation" "Check email format and password strength"
+# Created: abc123 (stays on current @)
 
-# Later, work on it
-jj edit <todo-change-id>
+jj-todo-create abc123 "Add validation tests" "Test valid/invalid emails and passwords"
+# Created: def456 (@ still hasn't moved)
 
-# Update status as you progress
-jj-flag-update @ wip
+# 2. Start working on first TODO
+jj edit abc123
+jj-flag-update @ wip   # Now [task:wip]
+
+# ... implement validation ...
+
+# 3. Verify ALL acceptance criteria met
+make test
+
+# 4. Ask to move to next task
+jj-todo-next
+### ... re-prints current specs out (to ensure compliance) and next possible TODOs ...
+
+# 4. Once we're sure everything is properly done, move to next TODO
+jj-todo-next --mark-as done def456   # Marks abc123 as [task:done], starts def456 as [task:wip]
+
+### ... etc
 ```
+
+**That's it!** Empty commits as specs, edit to work on them, `jj-todo-next --mark-as done` when FULLY complete.
 
 ## Status Flags
 
-Use description prefixes to track status at a glance:
+We use description prefixes to track status at a glance. The `[task:*]` namespace makes them greppable and avoids conflicts with other conventions.
 
 | Flag | Meaning |
 |------|---------|
-| `[todo]` | Not started, empty revision |
-| `[wip]` | Work in progress |
-| `[untested]` | Implementation done, tests missing |
-| `[broken]` | Tests failing, needs fixing |
-| `[review]` | Needs review (tricky code, design choice) |
-| (none) | Complete |
+| `[task:todo]` | Not started, empty revision |
+| `[task:wip]` | Work in progress |
+| `[task:untested]` | Implementation done, tests missing |
+| `[task:broken]` | Tests failing, needs fixing |
+| `[task:review]` | Needs review (tricky code, design choice) |
+| `[task:blocked]` | Waiting on external dependency |
+| `[task:done]` | Complete, all acceptance criteria met |
 
 ### Updating Flags
 
 ```bash
-# Using script (auto-detects current flag)
+# Using script
 jj-flag-update @ wip
 jj-flag-update @ untested
-jj-flag-update @ done      # "done" removes the flag
+jj-flag-update @ done
 
 # Manual (what the script does)
-jj log -r @ -n1 --no-graph -T description | sed 's/\[todo\]/[wip]/' | jj desc -r @ --stdin
+jj log -r @ -n1 --no-graph -T description | sed 's/\[task:todo\]/[task:wip]/' | jj desc -r @ --stdin
 ```
 
 ### Finding Flagged Revisions
 
 ```bash
-jj-find-flagged                     # All flagged
-jj-find-flagged todo                # Only [todo]
-jj-find-flagged wip                 # Only [wip]
+jj-find-flagged                     # All tasks
+jj-find-flagged todo                # Only [task:todo]
+jj-find-flagged wip                 # Only [task:wip]
+jj-find-flagged done                # Only [task:done]
 
-# Manual
-jj log -r 'description(substring:"[todo]")'
+# Manual - all tasks
+jj log -r 'description(substring:"[task:")'
+
+# Incomplete tasks only
+jj log -r 'description(substring:"[task:") & ~description(substring:"[task:done]")'
 ```
 
 ## Basic Workflow
@@ -64,10 +89,10 @@ jj log -r 'description(substring:"[todo]")'
 
 ```bash
 # Create linear chain of tasks
-jj-todo-create @ "Task 1: Setup data model"
-jj-todo-create <T1-id> "Task 2: Implement core logic"
-jj-todo-create <T2-id> "Task 3: Add API endpoints"
-jj-todo-create <T3-id> "Task 4: Write tests"
+jj-todo-create @ "Task 1: Setup data model" "...details..."
+jj-todo-create <T1-id> "Task 2: Implement core logic" "..."
+jj-todo-create <T2-id> "Task 3: Add API endpoints" "..."
+jj-todo-create <T3-id> "Task 4: Write tests" "..."
 ```
 
 ### 2. Work: Edit Each TODO
@@ -88,28 +113,47 @@ jj-flag-update @ untested
 
 ### 3. Complete and Move to Next
 
+`jj-todo-next` script is there to smooth out the "transition to next task" process.
+
+#### Without args
+- Print out current task's description so you can review and make sure everything is implemented as planned
+- Print out next possible task(s)
+
 ```bash
-# First, review the current task specs
-jj-todo-done
-
-# Shows the current task's specs and lists available next TODOs:
-#   📋 Current TODO Specs:
-#   [todo] Widget A
-#   ... details ...
+# Review current specs and see what's next
+jj-todo-next
+# Shows:
+#   📋 Current task specs for review:
+#   ─────────────────────
+#   ...
+#   ─────────────────────
 #
-#   Next TODOs available:
-#     abc123  [todo] Feature B
-#     def456  [todo] Feature C
-
-# When ready, specify which to work on next:
-jj-todo-done abc123
+#   Current task status: [task:wip]
+#   Mark as [task:done] only if FULLY COMPLIANT with specs above.
+#
+#   ✅ Available next tasks:
+#     abc123  [task:todo] Feature B
+#     def456  [task:todo] Feature C
+#
+#   ⚠️ Child tasks with unmet dependencies:
+#     xyz789  [task:todo] Integration
+#             Blocked by: abc123
 ```
 
-The script enforces an explicit workflow: first remind you of what you were supposed to implement, then require you to explicitly choose the next task. This prevents accidentally skipping important specs.
+#### With args
+- Update the flag of current task
+- Move (`jj edit`) to the next task
+- Update new task's flag to `[task:wip]`
 
-## Parallel Tasks (DAG)
+```bash
+# Actually mark current done and start editing next:
+jj-todo-next --mark-as done abc123
+# Does the `jj edit abc123` and shows its description
+```
 
-Create branches that can be worked independently:
+## Planning Parallel Tasks (DAG)
+
+Create branches that can be worked independently. Example:
 
 ```bash
 # Linear foundation
@@ -119,29 +163,33 @@ jj-todo-create <T1-id> "Task 2: Base components"
 # Parallel branches from Task 2
 jj-parallel-todos <T2-id> "Widget A" "Widget B" "Widget C"
 
-# Merge point (all three must complete first)
-jj new --no-edit <A-id> <B-id> <C-id> -m "[todo] Integration"
+# ... edit their descriptions to add more details ...
+
+# Merge point (all three parents must complete first)
+jj new --no-edit <A-id> <B-id> <C-id> -m "[task:todo] Integration of widgets\n\n..."
 ```
 
 **Result:**
 ```
-       [todo] Integration
-       /      |      \
+          Integration
+       /      |        \
    Widget A  Widget B  Widget C
-       \      |      /
-        Task 2: Base
-            |
-        Task 1: Core
+       \      |        /
+          Task 2: Base
+              |
+          Task 1: Core
 ```
 
 No rebasing needed - parents specified directly!
+
+**Important:** `jj-todo-next` checks dependencies (ie. parent tasks). It will warn if you try to start Integration before all parent tasks reach `[task:done]`.
 
 ## Writing Good TODO Descriptions
 
 ### Structure
 
 ```
-[todo] Short title (< 50 chars)
+Short title (< 50 chars)
 
 ## Context
 Why this task exists, what problem it solves.
@@ -154,13 +202,27 @@ Why this task exists, what problem it solves.
 Any hints, constraints, or approaches to consider.
 
 ## Acceptance criteria
-How to know when this is done.
+How to know when this is FULLY DONE (not just "good enough"):
+- Criterion 1
+- Criterion 2
 ```
+
+**Important:** Acceptance criteria define when you can mark as `[task:done]`. Be specific and testable.
+
+**The description should overall be as self-sufficient as possible**.
+It should provide an agent with little context to have every information needed to start working without having to take last-minute decisions that should have been specified before.
+
+Avoid redundancy by linking whenever possible to:
+- pre-existing spec documents
+- relevant examples in the codebase
+
+When including such links, **avoid unstable references like line numbers** which can become invalid with simple reformattings.
+Prefer e.g. section names, or label refs if linking to a spec in a format that supports them (like Markdown `#stuff`, LaTeX `\ref{stuff}` or Typst `@stuff`), or function/class names when referring to code.
 
 ### Example
 
 ```
-[todo] Implement user authentication
+Implement user authentication
 
 ## Context
 Users need to log in to access their data. Using JWT tokens
@@ -173,9 +235,9 @@ for stateless auth.
 - Invalid credentials return 401
 
 ## Implementation notes
-- Use bcrypt for password hashing
+- Use bcrypt for password hashing (see src/auth/admin.py::AdminLogin::hash_passwd which already uses it)
 - Store refresh tokens in Redis
-- See auth.md for token format spec
+- See auth.md (#about-tokens) for token format spec
 
 ## Acceptance criteria
 - All auth endpoints return correct status codes
@@ -185,16 +247,16 @@ for stateless auth.
 
 ## Documenting Implementation Deviations
 
-When implementation differs from specs, document it:
+When implementation differs from specs, DOCUMENT IT and JUSTIFY IT:
 
 ```bash
-# After implementing, add implementation notes
+# After implementing, add notes
 jj desc -r @ -m "$(jj-show-desc @)
 
-## Implementation
-- Used argon2 instead of bcrypt (more secure)
-- Added /auth/logout endpoint (not in original spec)
-- Rate limit: 5 attempts per minute (was unspecified)
+## Post-Implementation notes
+- Used argon2 instead of bcrypt. That's because contrary to admin case, here we also needed to comply with...
+- Added /auth/logout endpoint. Not in original spec but necessary because...
+- Set Rate limit to 5 attempts per minute. Was unspecified, had to make a choice.
 "
 ```
 
@@ -204,44 +266,9 @@ This creates an audit trail of decisions.
 
 TODOs work great with AI assistants:
 
-### Setup Phase (Human)
-
-```bash
-# Human creates the plan
-jj-todo-create @ "Refactor auth module" "
-## Requirements
-- Extract auth logic from handlers
-- Create AuthService class
-- Add unit tests
-- Update API docs
-"
-```
-
-### Execution Phase (AI)
-
-```bash
-# AI reads the task
-jj-show-desc <todo-id>
-
-# AI edits the revision
-jj edit <todo-id>
-jj-flag-update @ wip
-
-# ... AI implements ...
-
-# AI marks complete
-jj-flag-update @ untested
-```
-
-### Review Phase (Human)
-
-```bash
-# Human reviews what AI did
-jj log -r <todo-id>
-jj evolog -r <todo-id>
-
-# ...
-```
+- Human or Supervisor Agent does the initial planning and creates the graph of TODO revisions
+- Worker Agent(s) just "run" through the graph, following the structure and requirements, implementing each revision
+- Humain or Supervisor Agent can review the diffs and notes, and switch back tasks to e.g. `[todo:wip]` when necessary
 
 ## Tips
 
@@ -251,62 +278,63 @@ Each TODO should be completable in one focused session. If it's too big, split i
 
 ### Use `--no-edit` Religiously
 
-When creating TODOs, always use `jj-todo-create` or `jj new --no-edit`. Otherwise @ moves and you lose your place.
+When creating TODOs, always use `jj-todo-create` or `jj new --no-edit`.
+**Otherwise @ moves and you lose your place.**
 
-### Validate Between Steps
+### Completion Discipline: No "Good Enough"
 
-After completing each TODO, run your project's validation (typecheck, lint, tests) before moving to the next:
+**Do NOT mark a task as done unless ALL acceptance criteria are met.**
 
-```bash
-# Verify current work (use your project's commands)
-make check        # or: cargo build, pnpm tsc, go build, etc.
+✅ **Mark as done when:**
+- Every requirement implemented
+- All acceptance criteria pass
+- Tests pass (if applicable)
+- No known issues remain
 
-# Then complete and move to next
-jj-todo-done
-```
+❌ **Never mark as done when:**
+- "Good enough" or "mostly works"
+- Tests failing
+- Partial implementation
+- Workarounds instead of proper fixes
+- Planning to "come back to it later"
 
-This catches errors early when context is fresh, rather than debugging cascading failures at the end.
-
-### Watch for Hidden Dependencies
-
-When planning TODOs that touch service/module layers (especially with dependency injection), dependencies between components may not be obvious until you validate. A component might require a service you're modifying or replacing.
-
-If a later TODO fails due to missing dependencies from an earlier one, don't forget to edit the description to make clear the extra work you had to do which wasn't in the specs.
-
-The upfront planning helps surface these, but some will only appear at validation time.
-
-### Check DAG Before Starting
-
-```bash
-# Visualize the plan
-jj log -r '<first-todo>::'
-```
-
-### Reorder if Needed
-
-If you realize task order is wrong:
+**If incomplete:**
+- Use `--mark-as review` if needs feedback
+- Use `--mark-as blocked` if waiting on external dependency
+- Use `--mark-as untested` if some parts could not be tested for some reason
+- Stay on `[task:wip]` and keep working
 
 ```bash
-# Move Task B to be after Task C instead of Task A
-jj rebase -r <B-id> -d <C-id>
+# FIRST: Verify the work
+make check        # or: cargo build, pnpm tsc, uv run pytest
+
+# ONLY if all checks pass:
+jj-todo-next --mark-as done <next-id>
 ```
 
-### Abandon Obsolete TODOs
+### Check Dependencies Before Starting
+
+When working with parallel branches or complex DAGs:
 
 ```bash
-# If a TODO is no longer needed
-jj abandon <todo-id>
+# Check what a task depends on (its ancestors)
+jj log -r '::<rev-id>'
+
+# Check what depends on a task (its descendants)
+jj log -r '<rev-id>::'
 ```
+
+**Note:** `jj-todo-next` checks dependencies automatically, but it's just here to smooth things out, not to abstract from `jj`. Inspect the graph yourself when planning complex work.
 
 ## Helper Scripts
 
-Helper scripts in `scripts/`. Add to PATH or invoke directly.
+Helper scripts in `scripts/`. Invoke with full path to avoid PATH setup.
 
 | Script | Purpose |
 | ------ | ------- |
 | `jj-todo-create <PARENT> <TITLE> [DESC]` | Create TODO (stays on @) |
 | `jj-parallel-todos <PARENT> <T1> <T2>...` | Create parallel TODOs |
-| `jj-todo-done [NEXT_REV]` | Review specs (no arg) or complete+start next (with revision) |
+| `jj-todo-next [--mark-as STATUS] [REV]` | Review specs, check dependencies, mark & optionally move |
 | `jj-flag-update <REV> <TO_FLAG>` | Update status flag (auto-detects current) |
 | `jj-find-flagged [FLAG]` | Find flagged revisions |
 

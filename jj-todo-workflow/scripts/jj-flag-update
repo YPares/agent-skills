@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Update status flag in revision description
 # Usage: jj-flag-update <REV> <TO_FLAG>
-# TO_FLAG is: todo, wip, untested, broken, review, or "done" (removes flag)
+# TO_FLAG is: todo, wip, untested, broken, review, blocked, or "done"
 # Example: jj-flag-update @ wip
 # Example: jj-flag-update mxyz done
 #
@@ -11,7 +11,7 @@ set -euo pipefail
 
 if [[ $# -ne 2 ]]; then
   echo "Usage: jj-flag-update <REV> <TO_FLAG>" >&2
-  echo "Flags: todo, wip, untested, broken, review, done (done removes flag)" >&2
+  echo "Flags: todo, wip, untested, broken, review, blocked, done" >&2
   exit 1
 fi
 
@@ -23,30 +23,20 @@ desc=$(jj log -r "$rev" -n1 --no-graph -T description)
 
 # Detect current flag
 current_flag=""
-for flag in todo wip untested broken review; do
-  if [[ "$desc" =~ ^\[${flag}\] ]]; then
+for flag in todo wip untested broken review blocked done; do
+  if [[ "$desc" =~ ^\[task:${flag}\] ]]; then
     current_flag="$flag"
     break
   fi
 done
 
 if [[ -z "$current_flag" ]]; then
-  if [[ "$to_flag" == "done" ]]; then
-    # No flag to remove, nothing to do
-    exit 0
-  else
-    # No current flag - prepend the new one
-    echo "[${to_flag}] ${desc}" | jj desc -r "$rev" --stdin
-    exit 0
-  fi
+  # No current flag - prepend the new one
+  echo "[task:${to_flag}] ${desc}" | jj desc -r "$rev" --stdin
+  exit 0
 fi
 
-# Build sed pattern
-if [[ "$to_flag" == "done" ]]; then
-  # Remove the flag (and trailing space)
-  sed_pattern="s/\[${current_flag}\] //"
-else
-  sed_pattern="s/\[${current_flag}\]/[${to_flag}]/"
-fi
+# Build sed pattern - replace old flag with new
+sed_pattern="s/\[task:${current_flag}\]/[task:${to_flag}]/"
 
 echo "$desc" | sed "$sed_pattern" | jj desc -r "$rev" --stdin

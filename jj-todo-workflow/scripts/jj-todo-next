@@ -1,0 +1,197 @@
+#!/usr/bin/env bash
+# Review current task or transition to next task
+# Usage:
+#   jj-todo-next                           # Review mode: show current and available next
+#   jj-todo-next --mark-as <status> <REV>  # Mark current as status, move to REV
+#
+# Status: done, review, untested, blocked
+#
+# Examples:
+#   jj-todo-next                          # Show current specs and what's next
+#   jj-todo-next --mark-as done abc123    # Mark current done, start abc123
+#   jj-todo-next --mark-as review abc123  # Mark current needs review, start abc123
+
+set -euo pipefail
+
+SCRIPTS_DIR="$(dirname "$0")"
+
+# Parse arguments
+mark_as=""
+next_rev=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --mark-as)
+            mark_as="$2"
+            shift 2
+            ;;
+        *)
+            next_rev="$1"
+            shift
+            ;;
+    esac
+done
+
+# Check if current revision has a task flag
+current_desc=$(jj log -r @ -n1 --no-graph -T description)
+current_flag=""
+for flag in todo wip untested broken review blocked done; do
+    if [[ "$current_desc" =~ ^\[task:${flag}\] ]]; then
+        current_flag="$flag"
+        break
+    fi
+done
+
+# If no next_rev provided, enter review mode
+if [[ -z "$next_rev" ]]; then
+    if [[ -n "$current_flag" && "$current_flag" != "done" ]]; then
+        echo "📋 Current task specs for review:"
+        echo "─────────────────────"
+        echo "$current_desc"
+        echo "─────────────────────"
+        echo ""
+        echo "Current task status: [task:$current_flag]"
+        echo "- Mark as [task:done] only if FULLY COMPLIANT with specs above"
+        echo "- Keep working on current task if something is left to do"
+        echo "- Remember that divergences with the specs MUST be documented (edit  description to add Post-Implementation notes)"
+        echo ""
+    fi
+
+    # Find all children of @ (direct descendants)
+    all_children="$(jj log -r "children(@)" --no-graph -T 'change_id.shortest(8) ++ "\n"' 2>/dev/null || true)"
+
+    if [[ -z "$all_children" ]]; then
+        echo "No direct child tasks found. Manually update flag with jj-flag-update, and check remaining TODOs with jj-find-flagged or jj log"
+        exit 0
+    fi
+
+    # Separate children into ready and blocked
+    ready_children=()
+    blocked_children=()
+
+    while IFS= read -r child; do
+        [[ -z "$child" ]] && continue
+
+        # Check if this child has task flag
+        child_desc=$(jj log -r "$child" --no-graph -T 'description.first_line()')
+        if [[ ! "$child_desc" =~ ^\[task: ]]; then
+            continue
+        fi
+
+        # Check if all parents of this child except @ are [task:done] or have no task flag
+        parents=$(jj log -r "parents($child) ~ @" --no-graph -T 'change_id.shortest(8) ++ "\n"' 2>/dev/null || true)
+        all_parents_done=true
+        blocking_parents=""
+
+        while IFS= read -r parent; do
+            [[ -z "$parent" ]] && continue
+            parent_desc=$(jj log -r "$parent" --no-graph -T 'description.first_line()')
+
+            # Check if parent has a task flag that's not done
+            if [[ "$parent_desc" =~ ^\[task:(todo|wip|untested|broken|review|blocked)\] ]]; then
+                all_parents_done=false
+                if [[ -n "$blocking_parents" ]]; then
+                    blocking_parents="$blocking_parents, $parent"
+                else
+                    blocking_parents="$parent"
+                fi
+            fi
+        done <<< "$parents"
+
+        if $all_parents_done; then
+            ready_children+=("$child:$child_desc")
+        else
+            blocked_children+=("$child:$child_desc:$blocking_parents")
+        fi
+    done <<< "$all_children"
+
+    if [[ ${#ready_children[@]} -eq 0 && ${#blocked_children[@]} -eq 0 ]]; then
+        echo "ERROR: current task has children (${all_children[*]}) but couldn't determine which one(s) can be tackled next. Check 'jj log' manually"
+        exit 1
+    fi
+
+    if [[ ${#ready_children[@]} -gt 0 ]]; then
+        echo "✅ Available next tasks:"
+        echo ""
+        for item in "${ready_children[@]}"; do
+            child_id="${item%%:*}"
+            child_desc="${item#*:}"
+            echo "  $child_id  $child_desc"
+        done
+        echo ""
+    fi
+
+    if [[ ${#blocked_children[@]} -gt 0 ]]; then
+        echo "⚠️ Child tasks with unmet dependencies:"
+        echo ""
+        for item in "${blocked_children[@]}"; do
+            IFS=: read -r child_id child_desc blocking <<< "$item"
+            echo "  $child_id  $child_desc"
+            echo "             Blocked by: $blocking"
+        done
+        echo ""
+        echo "Check dependencies (ancestors) of a task with: jj log -r '::<task-id>'"
+        echo ""
+    fi
+
+    echo "Once you are SURE you are good to go, mark & transition to next task with:"
+    echo "  jj-todo-next --mark-as <new-status> <change-id>"
+    exit 0
+fi
+
+# next_rev provided - transition mode
+# Require --mark-as flag
+if [[ -z "$mark_as" ]]; then
+    echo "Error: --mark-as is required when transitioning to next task" >&2
+    echo "" >&2
+    echo "Usage: jj-todo-next --mark-as <status> <next-rev>" >&2
+    echo "Status: done, review, untested, blocked" >&2
+    echo "" >&2
+    echo "Examples:" >&2
+    echo "  jj-todo-next --mark-as done $next_rev" >&2
+    echo "  jj-todo-next --mark-as review $next_rev" >&2
+    exit 1
+fi
+
+# Validate --mark-as value
+case "$mark_as" in
+    done|review|untested|blocked)
+        ;;
+    *)
+        echo "Error: Invalid status '$mark_as'" >&2
+        echo "Valid statuses: done, review, untested, blocked" >&2
+        exit 1
+        ;;
+esac
+
+# Verify next task exists
+next_desc=$(jj log -r "$next_rev" --no-graph -T 'description.first_line()' 2>/dev/null || true)
+if [[ -z "$next_desc" ]]; then
+    echo "Error: Revision $next_rev not found or description empty" >&2
+    exit 1
+fi
+
+if [[ ! "$next_desc" =~ ^\[task: ]]; then
+    echo "ERROR: $next_rev doesn't appear to be a task (no [task:*] flag)" >&2
+    exit 1
+fi
+
+# NOW we mark current and move
+# This is atomic - only update flag when we're actually transitioning
+if [[ -n "$current_flag" ]]; then
+    "$SCRIPTS_DIR/jj-flag-update" @ "$mark_as"
+    echo "✅ Marked $current as [task:$mark_as]"
+else
+    echo "⚠️ Current revision has no [task:*] flag to change**"
+fi
+
+current=$(jj log -r @ --no-graph -T 'change_id.shortest(8)')
+
+# Move to next and mark as wip
+jj edit "$next_rev"
+"$SCRIPTS_DIR/jj-flag-update" @ wip
+
+echo "✅ Marked $next_rev as [task:wip]"
+echo "📋 Now editing revision $next_rev"
+echo "─────────────────"
+jj log -r @ --no-graph -T "description"

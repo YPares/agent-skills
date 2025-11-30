@@ -15,11 +15,11 @@ title="$2"
 description="${3:-}"
 
 if [[ -n "$description" ]]; then
-  msg="[todo] ${title}
+  msg="[task:todo] ${title}
 
 ${description}"
 else
-  msg="[todo] ${title}"
+  msg="[task:todo] ${title}"
 fi
 
 jj new --no-edit "$parent" -m "$msg"

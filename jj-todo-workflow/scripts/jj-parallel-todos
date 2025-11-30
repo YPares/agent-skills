@@ -14,7 +14,7 @@ parent="$1"
 shift
 
 for title in "$@"; do
-  jj new --no-edit "$parent" -m "[todo] ${title}"
+  jj new --no-edit "$parent" -m "[task:todo] ${title}"
 done
 
-echo "✅ Created $# parallel TODO branches from $parent"
+echo "✅ Created $# parallel task branches from $parent"
