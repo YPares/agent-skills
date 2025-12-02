@@ -1,15 +1,21 @@
 ---
 name: jj-todo-workflow
-description: Structured TODO commit workflow using JJ (Jujutsu). Use when planning tasks as empty commits with [task:*] flags, tracking progress through status transitions, managing parallel task DAGs with dependency checking, or AI-assisted development workflows. Enforces completion discipline. Requires the working-with-jj skill.
+description: Structured TODO commit workflow using JJ (Jujutsu). Use to plan tasks as empty commits with [task:*] flags, track progress through status transitions, manage parallel task DAGs with dependency checking. Enforces completion discipline. Enables to divide work between Planners and Workers. **Requires the working-with-jj skill**
 ---
 
 # JJ TODO Workflow
 
-Use empty revisions as TODO markers to enable structured development with clear milestones. Descriptions (i.e. commit messages) act as specifications for what to implement.
+The core idea is to use a DAG of empty revisions as TODO markers to enable structured development with clear milestones.
+Revision descriptions (i.e. commit messages) act as specifications for what to implement.
+JJ makes it easy to create such a structure, and then to fill each revision afterwards.
 
-**For more info on JJ basics, see the `working-with-jj` skill. We reuse scripts from that skill here.**
+**For more information on JJ basics, see the `working-with-jj` skill. We reuse scripts from that skill here.**
 
-## Quick Start
+This skill talks about two roles: **Planners** (who lay out the empty revisions and their specs) and **Workers** (who implement them).
+Depending on the situation, you may be acting as just Planner, just Worker, or both.
+It is better to have a good idea of the whole process, but section titles make it explicit which role is most concerned by each section.
+
+## Quick Start (Planners & Workers)
 
 Here's a complete cycle from planning to completion (**full paths to helper scripts not written**):
 
@@ -40,7 +46,7 @@ jj-todo-next --mark-as done def456   # Marks abc123 as [task:done], starts def45
 
 **That's it!** Empty commits as specs, edit to work on them, `jj-todo-next --mark-as done <next-step>` when FULLY complete.
 
-## Status Flags
+## Status Flags (Planners & Workers)
 
 We use description prefixes to track status at a glance. The `[task:*]` namespace makes them greppable and avoids conflicts with other conventions.
 
@@ -54,7 +60,7 @@ We use description prefixes to track status at a glance. The `[task:*]` namespac
 | `[task:blocked]` | Waiting on external dependency |
 | `[task:done]` | Complete, all acceptance criteria met |
 
-### Updating Flags
+### Updating Flags (Workers)
 
 ```bash
 jj-flag-update @ wip
@@ -62,7 +68,7 @@ jj-flag-update @ untested
 jj-flag-update @ done
 ```
 
-### Finding Flagged Revisions
+### Finding Flagged Revisions (Planners & Workers)
 
 ```bash
 jj-find-flagged                     # All tasks
@@ -77,9 +83,9 @@ jj log -r 'description(substring:"[task:")'
 jj log -r 'description(substring:"[task:") & ~description(substring:"[task:done]")'
 ```
 
-## Basic Workflow
+## Basic Workflow (Planners & Workers)
 
-### 1. Plan: Create TODO Chain
+### 1. Plan: Create TODO Chain (Planners)
 
 ```bash
 # Create linear chain of tasks
@@ -89,7 +95,7 @@ jj-todo-create <T2-id> "Task 3: Add API endpoints" "..."
 jj-todo-create <T3-id> "Task 4: Write tests" "..."
 ```
 
-### 2. Work: Edit Each TODO
+### 2. Work: Edit Each TODO (Workers)
 
 ```bash
 # Read the specs
@@ -105,7 +111,7 @@ jj-flag-update @ wip
 jj-flag-update @ untested
 ```
 
-### 3. Complete and Move to Next
+### 3. Complete and Move to Next (Workers)
 
 `jj-todo-next` script is there to smooth out the "transition to next task" process.
 
@@ -145,7 +151,7 @@ jj-todo-next --mark-as done abc123
 # Does the `jj edit abc123` and shows its description
 ```
 
-## Planning Parallel Tasks (DAG)
+## Planning Parallel Tasks (DAG) (Planners)
 
 Create branches that can be worked independently. Example:
 
@@ -176,7 +182,7 @@ jj new --no-edit <A-id> <B-id> <C-id> -m "[task:todo] Integration of widgets\n\n
 
 No rebasing needed - parents specified directly!
 
-## Writing Good TODO Descriptions
+## Writing Good TODO Descriptions (Planners)
 
 ### Structure
 
@@ -237,7 +243,40 @@ for stateless auth.
 - Rate limiting prevents brute force
 ```
 
-## Documenting Implementation Deviations
+## AI-Assisted TODO Workflow
+
+TODOs work great with AI sub-agents:
+
+- Supervisor Agent does the initial planning and creates the graph of TODO revisions
+- Sub-agent(s) just "run" through the graph, following the structure and requirements, implementing each revision **sequentially**
+- Supervisor Agent can review the diffs and notes, and switch back tasks to e.g. `[todo:wip]` when necessary
+
+**IMPORTANT: Sub-agents MUST work sequentially through tasks, not in parallel.**
+Running multiple agents concurrently on the same repository causes conflicts as they fight over the working copy (`@`).
+
+If parallel work is truly needed, you must use JJ workspaces (equivalent to git worktrees) to isolate each agent.
+However, **do not create workspaces** unless the human user explicitly agrees to it, as it adds significant complexity.
+
+See `references/parallel-agents.md` for detailed guide on using workspaces for parallel execution.
+
+But in any case, you will have to choose between giving ONE TODO to an agent, or a SEQUENCE of TODOs. When assigning just ONE todo
+to a sub-agent, it is better to abstract JJ away from them, so they do not have to load this skill.
+Prepare the scene for them by `jj edit`-ing into the correct revision, and deal with general JJ bookkeeping yourself.
+This way they can truly focus on the task they are given, and not be distracted by JJ specifics.
+
+## When to Stop and Report (Workers)
+
+**Follow the prescribed workflow only.**
+If you encounter any issues, STOP and report to the user, notably if:
+- Made changes in wrong revision
+- Need to undo or modify previous work
+- Uncertain about how to proceed
+- Dependencies or requirements unclear
+
+**DO NOT attempt to fix issues using any JJ operation not explicitly present in this workflow.**
+Let the user handle recovery operations. Your job is to follow the process or report when you can't.
+
+## Documenting Implementation Deviations (Workers)
 
 When implementation differs from specs, DOCUMENT IT and JUSTIFY IT:
 
@@ -254,46 +293,18 @@ jj desc -r @ -m "$(jj-show-desc @)
 
 This creates an audit trail of decisions.
 
-## When to Stop and Report
-
-**Follow the prescribed workflow only.**
-If you encounter any issues, STOP and report to the user, notably if:
-- Made changes in wrong revision
-- Need to undo or modify previous work
-- Uncertain about how to proceed
-- Dependencies or requirements unclear
-
-**DO NOT attempt to fix issues using any JJ operation not explicitly present in this workflow.**
-Let the user handle recovery operations. Your job is to follow the process or report when you can't.
-
-## AI-Assisted TODO Workflow
-
-TODOs work great with AI assistants:
-
-- Human or Supervisor Agent does the initial planning and creates the graph of TODO revisions
-- Worker Agent(s) just "run" through the graph, following the structure and requirements, implementing each revision **sequentially**
-- Human or Supervisor Agent can review the diffs and notes, and switch back tasks to e.g. `[todo:wip]` when necessary
-
-**IMPORTANT: Worker agents MUST work sequentially through tasks, not in parallel.**
-Running multiple agents concurrently on the same repository causes conflicts as they fight over the working copy (`@`).
-
-If parallel work is truly needed, you must use JJ workspaces (equivalent to git worktrees) to isolate each agent.
-However, **do not create workspaces** unless the human user explicitly agrees to it, as it adds significant complexity.
-
-See `references/parallel-agents.md` for detailed guide on using workspaces for parallel execution.
-
 ## Tips
 
-### Keep TODOs Small
+### Keep TODOs Small (Planners)
 
 Each TODO should be completable in one focused session. If it's too big, split into multiple TODOs.
 
-### Use `--no-edit` Religiously
+### Use `--no-edit` Religiously (Planners & Workers)
 
 When creating TODOs, always use `jj-todo-create` or `jj new --no-edit`.
 **Otherwise @ moves and you lose your place.**
 
-### Completion Discipline: No "Good Enough"
+### Completion Discipline: No "Good Enough" (Workers)
 
 **Do NOT mark a task as done unless ALL acceptance criteria are met.**
 
@@ -324,7 +335,7 @@ make check        # or: cargo build, pnpm tsc, uv run pytest
 jj-todo-next --mark-as done <next-id>
 ```
 
-### Check Dependencies Before Starting
+### Check Dependencies Before Starting (Workers)
 
 When working with parallel branches or complex DAGs:
 
@@ -338,7 +349,7 @@ jj log -r '<rev-id>::'
 
 **Note:** `jj-todo-next` checks dependencies automatically to indicate which children tasks aren't ready, but it's just here to smooth things out, not to abstract from `jj`. Inspect the graph yourself with `jj log` whenever needed.
 
-## Helper Scripts
+## Helper Scripts (Planners & Workers)
 
 Helper scripts in `scripts/`. Invoke with full path to avoid PATH setup.
 
@@ -360,4 +371,4 @@ Helper scripts in `scripts/`. Invoke with full path to avoid PATH setup.
 
 Advanced topics and detailed guides:
 
-- `references/parallel-agents.md` - Using JJ workspaces for parallel agent execution
+- `references/parallel-agents.md` - Using JJ workspaces for parallel agent execution (Planners)
