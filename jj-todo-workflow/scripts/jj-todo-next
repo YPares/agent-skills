@@ -4,12 +4,13 @@
 #   jj-todo-next                           # Review mode: show current and available next
 #   jj-todo-next --mark-as <status> <REV>  # Mark current as status, move to REV
 #
-# Status: done, review, untested, blocked
+# Status: specs, todo, done, review, untested, blocked
 #
 # Examples:
 #   jj-todo-next                          # Show current specs and what's next
 #   jj-todo-next --mark-as done abc123    # Mark current done, start abc123
 #   jj-todo-next --mark-as review abc123  # Mark current needs review, start abc123
+#   jj-todo-next --mark-as specs abc123   # Mark current as needing specs, start abc123
 
 set -euo pipefail
 
@@ -35,7 +36,7 @@ done
 # Check if current revision has a task flag
 current_desc=$(jj log -r @ -n1 --no-graph -T description)
 current_flag=""
-for flag in todo wip untested broken review blocked done; do
+for flag in specs todo wip untested broken review blocked done; do
     if [[ "$current_desc" =~ ^\[task:${flag}\] ]]; then
         current_flag="$flag"
         break
@@ -60,14 +61,10 @@ if [[ -z "$next_rev" ]]; then
     # Find all children of @ (direct descendants)
     all_children="$(jj log -r "children(@)" --no-graph -T 'change_id.shortest(8) ++ "\n"' 2>/dev/null || true)"
 
-    if [[ -z "$all_children" ]]; then
-        echo "No direct child tasks found. Manually update flag with jj-flag-update, and check remaining TODOs with jj-find-flagged or jj log"
-        exit 0
-    fi
-
-    # Separate children into ready and blocked
+    # Separate children into ready, blocked, and needs-specs
     ready_children=()
     blocked_children=()
+    needs_specs_children=()
 
     while IFS= read -r child; do
         [[ -z "$child" ]] && continue
@@ -75,6 +72,12 @@ if [[ -z "$next_rev" ]]; then
         # Check if this child has task flag
         child_desc=$(jj log -r "$child" --no-graph -T 'description.first_line()')
         if [[ ! "$child_desc" =~ ^\[task: ]]; then
+            continue
+        fi
+
+        # Check if this child needs specs
+        if [[ "$child_desc" =~ ^\[task:specs\] ]]; then
+            needs_specs_children+=("$child:$child_desc")
             continue
         fi
 
@@ -88,7 +91,7 @@ if [[ -z "$next_rev" ]]; then
             parent_desc=$(jj log -r "$parent" --no-graph -T 'description.first_line()')
 
             # Check if parent has a task flag that's not done
-            if [[ "$parent_desc" =~ ^\[task:(todo|wip|untested|broken|review|blocked)\] ]]; then
+            if [[ "$parent_desc" =~ ^\[task:(specs|todo|wip|untested|broken|review|blocked)\] ]]; then
                 all_parents_done=false
                 if [[ -n "$blocking_parents" ]]; then
                     blocking_parents="$blocking_parents, $parent"
@@ -105,15 +108,35 @@ if [[ -z "$next_rev" ]]; then
         fi
     done <<< "$all_children"
 
-    if [[ ${#ready_children[@]} -eq 0 && ${#blocked_children[@]} -eq 0 ]]; then
+    if [[ ${#ready_children[@]} -eq 0 && ${#blocked_children[@]} -eq 0 && ${#needs_specs_children[@]} -eq 0 ]]; then
         echo "ERROR: current task has children (${all_children[*]}) but couldn't determine which one(s) can be tackled next. Check 'jj log' manually"
         exit 1
     fi
 
     if [[ ${#ready_children[@]} -gt 0 ]]; then
-        echo "✅ Available next tasks:"
+        echo "✅ Child tasks ready for work:"
         echo ""
         for item in "${ready_children[@]}"; do
+            child_id="${item%%:*}"
+            child_desc="${item#*:}"
+            echo "  $child_id  $child_desc"
+        done
+        echo ""
+        echo "Once you are SURE you are good to go, mark & transition to next task with:"
+        echo "  jj-todo-next --mark-as <new-status> <change-id>"
+        echo ""
+    else
+        echo "NO CHILD TASK READY FOR WORK"
+        echo ""
+        echo "  - Manually update flag with jj-flag-update"
+        ecgo "  - Check remaining TODOs with jj-find-flagged or jj log"
+        echo ""
+    fi
+
+    if [[ ${#needs_specs_children[@]} -gt 0 ]]; then
+        echo "📝 Child tasks NOT ready (need more specifications):"
+        echo ""
+        for item in "${needs_specs_children[@]}"; do
             child_id="${item%%:*}"
             child_desc="${item#*:}"
             echo "  $child_id  $child_desc"
@@ -122,7 +145,7 @@ if [[ -z "$next_rev" ]]; then
     fi
 
     if [[ ${#blocked_children[@]} -gt 0 ]]; then
-        echo "⚠️ Child tasks with unmet dependencies:"
+        echo "⚠️ Child tasks NOT ready (have unmet dependencies):"
         echo ""
         for item in "${blocked_children[@]}"; do
             IFS=: read -r child_id child_desc blocking <<< "$item"
@@ -134,8 +157,6 @@ if [[ -z "$next_rev" ]]; then
         echo ""
     fi
 
-    echo "Once you are SURE you are good to go, mark & transition to next task with:"
-    echo "  jj-todo-next --mark-as <new-status> <change-id>"
     exit 0
 fi
 
@@ -145,7 +166,7 @@ if [[ -z "$mark_as" ]]; then
     echo "Error: --mark-as is required when transitioning to next task" >&2
     echo "" >&2
     echo "Usage: jj-todo-next --mark-as <status> <next-rev>" >&2
-    echo "Status: done, review, untested, blocked" >&2
+    echo "Status: specs, todo, done, review, untested, blocked" >&2
     echo "" >&2
     echo "Examples:" >&2
     echo "  jj-todo-next --mark-as done $next_rev" >&2
@@ -155,11 +176,11 @@ fi
 
 # Validate --mark-as value
 case "$mark_as" in
-    done|review|untested|blocked)
+    specs|todo|done|review|untested|blocked)
         ;;
     *)
         echo "Error: Invalid status '$mark_as'" >&2
-        echo "Valid statuses: done, review, untested, blocked" >&2
+        echo "Valid statuses: specs, todo, done, review, untested, blocked" >&2
         exit 1
         ;;
 esac
