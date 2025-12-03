@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-# Show detailed revision info with diff
-# Usage: jj-show-detailed [REV]
-# REV defaults to @
-
-set -euo pipefail
-
-rev="${1:-@}"
-jj log -r "$rev" -n1 --no-graph -T builtin_log_detailed --git

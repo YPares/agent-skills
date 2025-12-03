@@ -9,7 +9,7 @@ description: Expert guidance for using JJ (Jujutsu) version control system. Use 
 
 - **Change IDs** (immutable) vs **Commit IDs** (content-based hashes that change
   on edit)
-- **Operations log** - every operation can be undone with `jj op restore`
+- **Operations log** - every operation can be undone
 - **No staging area** - working copy auto-snapshots
 - **Conflicts don't block** - resolve later
 - **Commits are lightweight** - edit freely
@@ -17,8 +17,9 @@ description: Expert guidance for using JJ (Jujutsu) version control system. Use 
 ## Essential Commands
 
 ```bash
-jj log -r <revset>                    # View history
-jj evolog -r <rev> --git              # Change evolution (with diffs)
+jj log -r <revset> [-p]               # View history, or part of it (--patch (-p): include diffs)
+jj show -r <rev>                      # Show the details of a revision (with whole description and diff)
+jj evolog -r <rev> [-p]               # View a revision's evolution 
 jj new <base>                         # Create revision and edit it
 jj new --no-edit <base>               # Create without switching (e.g. to add somewhere an empty TODO task for later)
 jj edit <rev>                         # Switch to editing revision
@@ -26,13 +27,13 @@ jj desc -r <rev> -m "text"            # Set description
 
 jj diff                               # Changes in @
 jj diff -r <rev>                      # Changes in revision
-jj restore <path>                     # Discard changes to file
+jj restore <path>                     # Discard changes to files
 jj restore --from <commit-id> <paths...> # Restore from another revision/commit, a previous state (commit) of the current revision, etc.
 
 jj split -r <rev> <paths...> -m "text" # Split <rev> into two revisions, by giving a message for the first revision, and which changes (based on filepaths) should go into it
 
-jj rebase -s <src> -d <dest>          # Rebase with descendants
-jj rebase -r <rev> -d <dest>          # Rebase single revision only
+jj rebase -s <src> -d <dest>          # Rebase with descendants onto <dest>
+jj rebase -r <rev> -d <dest>          # Rebase single revision only onto <dest>
 ```
 
 ## Quick Revset Reference
@@ -43,7 +44,7 @@ jj rebase -r <rev> -d <dest>          # Rebase single revision only
 @::                                   # Descendants
 mine()                                # Your changes
 conflict()                            # Has conflicts
-description(substring:"text")         # Match description
+description(substring-i:"text")       # Match description (partial match, case-insensitive)
 A | B, A & B, A ~ B                   # Union, intersection, difference
 ```
 
@@ -77,8 +78,7 @@ Helper scripts in `scripts/`. Add to PATH or invoke directly.
 
 | Script                                    | Purpose                                |
 | ----------------------------------------- | -------------------------------------- |
-| `jj-show-desc [REV]`                      | Get description only                   |
-| `jj-show-detailed [REV]`                  | Detailed info with git diff            |
+| `jj-show-desc [REV]`                      | Print full description only            |
 | `jj-desc-transform <REV> <CMD...>`        | Pipe description through command       |
 | `jj-batch-desc <SED_FILE> <REV...>`       | Batch transform descriptions           |
 | `jj-checkpoint [NAME]`                    | Record op ID before risky operations   |

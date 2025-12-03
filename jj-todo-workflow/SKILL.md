@@ -354,7 +354,7 @@ Helper scripts in `scripts/`. Invoke with full path to avoid PATH setup.
 
 | Script | Purpose |
 | ------ | ------- |
-| `jj-show-desc [REV]` | Get description of a revision |
+| `jj-show-desc [REV]` | Print description of a revision |
 
 ## References
 
