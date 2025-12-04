@@ -52,7 +52,7 @@ We use description prefixes to track status at a glance. The `[task:*]` namespac
 
 | Flag | Meaning |
 |------|---------|
-| `[task:specs]` | Placeholder created, needs full specification |
+| `[task:draft]` | Placeholder created, needs full specification |
 | `[task:todo]` | Not started, empty revision with complete specs |
 | `[task:wip]` | Work in progress |
 | `[task:untested]` | Implementation done, tests missing |
@@ -61,9 +61,9 @@ We use description prefixes to track status at a glance. The `[task:*]` namespac
 | `[task:blocked]` | Waiting on external dependency |
 | `[task:done]` | Complete, all acceptance criteria met |
 
-### When to Use `specs` vs `todo` (Planners)
+### When to Use `draft` vs `todo` (Planners)
 
-**Use `[task:specs]`** when:
+**Use `[task:draft]`** when:
 - Creating placeholder tasks to establish the DAG structure
 - The task title/concept is clear but details aren't worked out yet
 - You want to defer writing full acceptance criteria
@@ -77,7 +77,7 @@ We use description prefixes to track status at a glance. The `[task:*]` namespac
 ### Updating Flags (Workers & Planners)
 
 ```bash
-jj-flag-update @ specs     # Mark as needing specification (Planners)
+jj-flag-update @ draft     # Mark as needing specification (Planners)
 jj-flag-update @ todo      # Mark as ready to work on (Planners)
 jj-flag-update @ wip       # Start work (Workers)
 jj-flag-update @ untested  # Implementation done, tests missing (Workers)
@@ -88,7 +88,7 @@ jj-flag-update @ done      # Complete (Workers)
 
 ```bash
 jj-find-flagged                     # All tasks
-jj-find-flagged specs               # Only [task:specs]
+jj-find-flagged draft               # Only [task:draft]
 jj-find-flagged todo                # Only [task:todo]
 jj-find-flagged wip                 # Only [task:wip]
 jj-find-flagged done                # Only [task:done]
@@ -265,10 +265,10 @@ for stateless auth.
 TODOs work great with AI sub-agents:
 
 - Supervisor Agent does the initial planning and creates the graph of TODO revisions
-- Supervisor Agent ensures all `[task:specs]` tasks are filled in and marked as `[task:todo]` before workers start
+- Supervisor Agent ensures all `[task:draft]` tasks are filled in and marked as `[task:todo]` before workers start
 - Sub-agent(s) just "run" through the graph, following the structure and requirements, implementing each revision **sequentially**
-- Sub-agents should only work on `[task:todo]` tasks (with complete specs), never on `[task:specs]` tasks
-- Supervisor Agent can review the diffs and notes, and switch back tasks to e.g. `[task:wip]` or `[task:specs]` when necessary
+- Sub-agents should only work on `[task:todo]` tasks (with complete specs), never on `[task:draft]` tasks
+- Supervisor Agent can review the diffs and notes, and switch back tasks to e.g. `[task:wip]` or `[task:draft]` when necessary
 
 **IMPORTANT: Sub-agents MUST work sequentially through tasks, not in parallel.**
 Running multiple agents concurrently on the same repository causes conflicts as they fight over the working copy (`@`).
@@ -374,8 +374,8 @@ Helper scripts in `scripts/`. Invoke with full path to avoid PATH setup.
 
 | Script | Purpose |
 | ------ | ------- |
-| `jj-todo-create [--specs] <PARENT> <TITLE> [DESC]` | Create TODO (stays on @). Use --specs for placeholder tasks |
-| `jj-parallel-todos [--specs] <PARENT> <T1> <T2>...` | Create parallel TODOs. Use --specs for placeholder tasks |
+| `jj-todo-create [--draft] <PARENT> <TITLE> [DESC]` | Create TODO (stays on @). Use --draft for placeholder tasks |
+| `jj-parallel-todos [--draft] <PARENT> <T1> <T2>...` | Create parallel TODOs. Use --draft for placeholder tasks |
 | `jj-todo-next [--mark-as STATUS] [REV]` | Review specs, check dependencies, mark & optionally move |
 | `jj-flag-update <REV> <TO_FLAG>` | Update status flag (auto-detects current) |
 | `jj-find-flagged [FLAG]` | Find flagged revisions |

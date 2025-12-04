@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 # Create multiple parallel TODO branches from same parent
-# Usage: jj-parallel-todos [--specs] <PARENT> <TITLE1> <TITLE2> [TITLE3...]
+# Usage: jj-parallel-todos [--draft] <PARENT> <TITLE1> <TITLE2> [TITLE3...]
 # Example: jj-parallel-todos @ "Widget A" "Widget B" "Widget C"
-# Example: jj-parallel-todos --specs @ "Widget A" "Widget B"  # Creates with [task:specs]
+# Example: jj-parallel-todos --draft @ "Widget A" "Widget B"  # Creates with [task:draft]
 
 set -euo pipefail
 
 # Parse flags
 flag="todo"
-if [[ "${1:-}" == "--specs" ]]; then
-  flag="specs"
+if [[ "${1:-}" == "--draft" ]]; then
+  flag="draft"
   shift
 fi
 
 if [[ $# -lt 2 ]]; then
-  echo "Usage: jj-parallel-todos [--specs] <PARENT> <TITLE1> <TITLE2> [TITLE3...]" >&2
-  echo "  --specs: Create with [task:specs] flag instead of [task:todo]" >&2
+  echo "Usage: jj-parallel-todos [--draft] <PARENT> <TITLE1> <TITLE2> [TITLE3...]" >&2
+  echo "  --draft: Create with [task:draft] flag instead of [task:todo]" >&2
   exit 1
 fi
 

@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 # Create empty TODO revision without editing (stays on current @)
-# Usage: jj-todo-create [--specs] <PARENT> <TITLE> [DESCRIPTION]
+# Usage: jj-todo-create [--draft] <PARENT> <TITLE> [DESCRIPTION]
 # Example: jj-todo-create @ "implement feature X" "detailed specs here"
-# Example: jj-todo-create --specs @ "implement feature X"  # Creates with [task:specs] for later specification
+# Example: jj-todo-create --draft @ "implement feature X"  # Creates with [task:draft] for later specification
 
 set -euo pipefail
 
 # Parse flags
 flag="todo"
-if [[ "${1:-}" == "--specs" ]]; then
-  flag="specs"
+if [[ "${1:-}" == "--draft" ]]; then
+  flag="draft"
   shift
 fi
 
 if [[ $# -lt 2 ]]; then
-  echo "Usage: jj-todo-create [--specs] <PARENT> <TITLE> [DESCRIPTION]" >&2
-  echo "  --specs: Create with [task:specs] flag instead of [task:todo]" >&2
+  echo "Usage: jj-todo-create [--draft] <PARENT> <TITLE> [DESCRIPTION]" >&2
+  echo "  --draft: Create with [task:draft] flag instead of [task:todo]" >&2
   exit 1
 fi
 
