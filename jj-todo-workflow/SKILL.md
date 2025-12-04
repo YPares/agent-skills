@@ -5,7 +5,8 @@ description: Structured TODO commit workflow using JJ (Jujutsu). Use to plan tas
 
 # JJ TODO Workflow
 
-The core idea is to use a DAG of empty revisions as TODO markers to enable structured development with clear milestones.
+The core idea is to use a DAG of empty revisions as TODO markers, representing tasks to be done,
+and then come back later to edit these revisions to actually do the tasks. This enables structured development with clear milestones.
 Revision descriptions (i.e. commit messages) act as specifications for what to implement.
 JJ makes it easy to create such a structure, and then to fill each revision afterwards.
 
@@ -40,7 +41,7 @@ make test  # Or equivalent in your project
 jj-todo-next
 ### ... review current specs (to ensure compliance) and next possible TODOs ...
 
-# 4. Once we're sure everything is properly done, move to next TODO
+# 5. Once we're sure everything is properly done, move to next TODO
 jj-todo-next --mark-as done def456   # Marks abc123 as [task:done], starts def456 as [task:wip]
 ```
 
@@ -273,12 +274,13 @@ TODOs work great with AI sub-agents:
 **IMPORTANT: Sub-agents MUST work sequentially through tasks, not in parallel.**
 Running multiple agents concurrently on the same repository causes conflicts as they fight over the working copy (`@`).
 
-If parallel work is truly needed, you must use JJ workspaces (equivalent to git worktrees) to isolate each agent.
-However, **do not create workspaces** unless the human user explicitly agrees to it, as it adds significant complexity.
+**IF** parallel work is truly needed, you must use JJ workspaces (equivalent to git worktrees) to isolate each agent.
+See `references/parallel-agents.md` for detailed guide on using JJ workspaces for parallel execution.
+However, **do not create workspaces** unless the human user explicitly agrees to it, as:
+- it adds significant complexity,
+- this part of the skill is still **beta**.
 
-See `references/parallel-agents.md` for detailed guide on using workspaces for parallel execution.
-
-But in any case, you will have to choose between giving ONE TODO to an agent, or a SEQUENCE of TODOs. When assigning just ONE todo
+Whatever the case, you will have to choose between giving ONE TODO to an agent, or a SEQUENCE of TODOs. When assigning just ONE todo
 to a sub-agent, it is better to abstract JJ away from them, so they do not have to load this skill.
 Prepare the scene for them by `jj edit`-ing into the correct revision, and deal with general JJ bookkeeping yourself.
 This way they can truly focus on the task they are given, and not be distracted by JJ specifics.
@@ -288,7 +290,7 @@ This way they can truly focus on the task they are given, and not be distracted 
 **Follow the prescribed workflow only.**
 If you encounter any issues, STOP and report to the user, notably if:
 - Made changes in wrong revision
-- Need to undo or modify previous work
+- Notice that previous work needs fixes and should be amended
 - Uncertain about how to proceed
 - Dependencies or requirements unclear
 
@@ -297,7 +299,7 @@ Let the user handle recovery operations. Your job is to follow the process or re
 
 ## Documenting Implementation Deviations (Workers)
 
-When implementation differs from specs, DOCUMENT IT and JUSTIFY IT:
+When implementation differs from specs, whatever the reason DOCUMENT IT and JUSTIFY IT:
 
 ```bash
 # After implementing, add notes
@@ -309,6 +311,8 @@ jj desc -r @ -m "$(jj-show-desc @)
 - Set Rate limit to 5 attempts per minute. Was unspecified, had to make a choice.
 "
 ```
+
+REMINDER: `jj-show-desc` if from the `working-with-jj` skill.
 
 This creates an audit trail of decisions.
 
@@ -356,15 +360,17 @@ jj-todo-next --mark-as done <next-id>
 
 ### Check Dependencies Before Starting (Workers)
 
-When working with parallel branches or complex DAGs:
+If working with parallel branches or complex DAGs, when starting on a new TODO:
 
 ```bash
-# Check what a task depends on (its ancestors)
-jj log -r '::<rev-id>'
+# Check what a task depends on (its immediate ancestors)
+jj log -r 'ancestors(<rev-id>,2)'  # 2 for parents, 3 for parents + grandparents, etc.
 
-# Check what depends on a task (its descendants)
-jj log -r '<rev-id>::'
+# Check what depends on a task (its immediate descendants)
+jj log -r 'descendants(<rev-id>,2)'  # 2 for children, 3 for children + grandchildren, etc.
 ```
+
+If any dependency (ancestor) has a `[task:*]` flag which is still `draft`, `todo`, `broken` or `wip`: STOP AND WARN THE USER. Wait for their approval before continuing.
 
 **Note:** `jj-todo-next` checks dependencies automatically to indicate which children tasks aren't ready, but it's just here to smooth things out, not to abstract from `jj`. Inspect the graph yourself with `jj log` whenever needed.
 

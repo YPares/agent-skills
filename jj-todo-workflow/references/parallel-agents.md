@@ -1,5 +1,7 @@
 # Parallel Agents with JJ Workspaces
 
+**THIS PART OF THE SKILL IS STILL IN A BETA STATE. NEEDS MORE TESTING**
+
 **TL;DR**: Use JJ workspaces to run multiple agents in parallel on different tasks. Each workspace gets its own working copy (`@`), preventing conflicts.
 
 ## The Problem
