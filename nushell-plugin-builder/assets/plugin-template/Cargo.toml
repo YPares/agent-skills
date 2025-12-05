@@ -1,0 +1,11 @@
+[package]
+name = "nu_plugin_PLUGIN_NAME"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+nu-plugin = "0.109.1"
+nu-protocol = "0.109.1"
+
+[dev-dependencies]
+nu-plugin-test-support = "0.109.1"
