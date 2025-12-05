@@ -5,27 +5,88 @@
     "email": "yves.pares@gmail.com"
   },
   "metadata": {
-    "description": "Various skills for AI agents (Claude Skills format)",
+    "description": "Various skills for AI agents (Claude Skills format), organized by technology",
     "version": "1.0.0"
   },
   "plugins": [
     {
-      "name": "ypares-agent-skills",
-      "description": "Collection of productivity and development skills including GitHub workflow automation, Nix packaging, Textual TUI building, Typst document creation, and Jujutsu VCS workflows",
+      "name": "jujutsu-skills",
+      "description": "Skills for working with Jujutsu VCS, including core workflows and TODO-based development patterns",
       "source": "./",
       "version": "1.0.0",
       "homepage": "https://github.com/YPares/agent-skills",
       "license": "MIT",
-      "keywords": ["github", "nix", "textual", "typst", "jujutsu", "workflow"],
+      "keywords": ["jujutsu", "jj", "vcs", "version-control", "workflow"],
       "strict": false,
       "skills": [
-        "./github-pr-workflow",
-        "./nix-profile-manager",
-        "./package-npm-nix",
-        "./textual-builder",
-        "./typst-writer",
         "./working-with-jj",
         "./jj-todo-workflow"
+      ]
+    },
+    {
+      "name": "nix-skills",
+      "description": "Skills for Nix package management and NPM packaging with Nix",
+      "source": "./",
+      "version": "1.0.0",
+      "homepage": "https://github.com/YPares/agent-skills",
+      "license": "MIT",
+      "keywords": ["nix", "nixpkgs", "package-management", "npm"],
+      "strict": false,
+      "skills": [
+        "./nix-profile-manager",
+        "./package-npm-nix"
+      ]
+    },
+    {
+      "name": "python-skills",
+      "description": "Skills for Python development, including Textual TUI application building",
+      "source": "./",
+      "version": "1.0.0",
+      "homepage": "https://github.com/YPares/agent-skills",
+      "license": "MIT",
+      "keywords": ["python", "textual", "tui", "terminal-ui"],
+      "strict": false,
+      "skills": [
+        "./textual-builder"
+      ]
+    },
+    {
+      "name": "nushell-skills",
+      "description": "Skills for Nushell development, including plugin creation in Rust",
+      "source": "./",
+      "version": "1.0.0",
+      "homepage": "https://github.com/YPares/agent-skills",
+      "license": "MIT",
+      "keywords": ["nushell", "nu", "plugin", "rust", "shell"],
+      "strict": false,
+      "skills": [
+        "./nushell-plugin-builder"
+      ]
+    },
+    {
+      "name": "github-skills",
+      "description": "Skills for GitHub workflows, including pull request automation",
+      "source": "./",
+      "version": "1.0.0",
+      "homepage": "https://github.com/YPares/agent-skills",
+      "license": "MIT",
+      "keywords": ["github", "git", "pr", "pull-request", "workflow"],
+      "strict": false,
+      "skills": [
+        "./github-pr-workflow"
+      ]
+    },
+    {
+      "name": "typst-skills",
+      "description": "Skills for creating documents with Typst markup language",
+      "source": "./",
+      "version": "1.0.0",
+      "homepage": "https://github.com/YPares/agent-skills",
+      "license": "MIT",
+      "keywords": ["typst", "document", "markup", "publishing"],
+      "strict": false,
+      "skills": [
+        "./typst-writer"
       ]
     }
   ]
