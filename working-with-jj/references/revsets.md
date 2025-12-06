@@ -15,6 +15,17 @@ jj help -k revsets    # Official documentation
 root()                # Root commit (empty ancestor)
 <change-id>           # By change ID (e.g., abc, xyzmno)
 <commit-id>           # By commit hash
+visible()             # All visible revisions (built-in alias)
+hidden()              # All hidden revisions (built-in alias)
+```
+
+**Note (v0.32+):** Bare symbols no longer resolve to multiple revisions.
+Use explicit functions for prefix queries:
+
+```bash
+change_id(abc)        # Match change IDs starting with 'abc'
+commit_id(abc)        # Match commit IDs starting with 'abc'
+bookmarks(exact:name) # Match bookmark by exact name
 ```
 
 ## Ancestry Operators
@@ -28,6 +39,14 @@ root()                # Root commit (empty ancestor)
 # Exclusive variants
 @-                    # Immediate parents only
 @+                    # Immediate children only
+
+# Depth-limited queries (v0.31+)
+ancestors(@, 3)       # Ancestors up to depth 3 (parents + grandparents + great-grandparents)
+descendants(@, 2)     # Descendants up to depth 2 (children + grandchildren)
+parents(@, 2)         # Parents at EXACTLY depth 2 (grandparents only)
+children(@, 2)        # Children at EXACTLY depth 2 (grandchildren only)
+first_parent(@)       # First parent only (useful for merge commits)
+first_ancestors(@)    # Ancestors via first parent chain only
 ```
 
 ## Filter Functions
@@ -37,19 +56,32 @@ mine()                          # Your changes (by author)
 heads(all())                    # All head revisions (no children)
 roots(<revset>)                 # Roots of given revset
 empty()                         # Empty revisions (no diff)
-conflict()                      # Revisions with unresolved conflicts
+conflicted()                    # Revisions with unresolved conflicts (renamed from conflict() in v0.33)
 immutable()                     # Immutable revisions (usually main, tags)
 mutable()                       # Mutable revisions
+signed()                        # Cryptographically signed commits
 
 # Text matching
-description(substring:"text")   # Match in description
+description(substring:"text")   # Match anywhere in description
 description(exact:"text")       # Exact description match
+subject(substring:"text")       # Match first line only
 author(substring:"name")        # Match author name/email
 committer(substring:"name")     # Match committer
+
+# Specific field matching (v0.26+)
+author_name(substring:"name")   # Match author name only
+author_email(glob:"*@example.com") # Match author email
+committer_name(substring:"name")   # Match committer name
+committer_email(glob:"*@corp.com") # Match committer email
 
 # File-based
 files("path/to/file")            # Revisions that modified this file
 files(glob:"src/*.rs")           # Glob pattern matching
+
+# Validation & debugging
+exactly(revset, N)              # Assert revset has exactly N elements (errors otherwise)
+bisect(revset)                  # For binary search debugging
+fork_point(revset)              # Common ancestor for rebasing
 ```
 
 ## Set Operations

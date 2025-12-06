@@ -1,6 +1,7 @@
 ---
 name: working-with-jj
 description: Expert guidance for using JJ (Jujutsu) version control system. Use when working with JJ, whatever the subject. Operations, revsets, templates, debugging change evolution, etc. Covers JJ commands, template system, evolog, operations log, and interoperability with git remotes.
+version_target: "0.36.x"
 ---
 
 # JJ (Jujutsu) Version Control Helper
@@ -9,31 +10,55 @@ description: Expert guidance for using JJ (Jujutsu) version control system. Use 
 
 - **Change IDs** (immutable) vs **Commit IDs** (content-based hashes that change
   on edit)
-- **Operations log** - every operation can be undone
+- **Operations log** - every operation can be undone (progressive: multiple `jj undo` goes further back, `jj redo` reverses)
 - **No staging area** - working copy auto-snapshots
 - **Conflicts don't block** - resolve later
 - **Commits are lightweight** - edit freely
+- **Colocated by default** - Git repos have both `.jj` and `.git` (since v0.34)
 
 ## Essential Commands
 
 ```bash
-jj log -r <revset> [-p]               # View history, or part of it (--patch (-p): include diffs)
-jj show -r <rev>                      # Show the details of a revision (with whole description and diff)
-jj evolog -r <rev> [-p]               # View a revision's evolution 
-jj new <base>                         # Create revision and edit it
-jj new --no-edit <base>               # Create without switching (e.g. to add somewhere an empty TODO task for later)
+jj log -r <revset> [-p]               # View history (--patch/-p: include diffs, --count: just count)
+jj log -r <revset> -G                 # -G is short for --no-graph
+jj show -r <rev>                      # Show revision details (description + diff)
+jj evolog -r <rev> [-p]               # View a revision's evolution
+jj new [-A] <base>                    # Create revision and edit it (-A: insert between <base> and its children rather than just on top of base)
+jj new --no-edit <base>               # Create without switching
 jj edit <rev>                         # Switch to editing revision
 jj desc -r <rev> -m "text"            # Set description
+jj metaedit -r <rev> -m "text"        # Modify metadata (author, timestamps, description)
 
 jj diff                               # Changes in @
 jj diff -r <rev>                      # Changes in revision
+jj file show -r <rev> <path>          # Show file contents at revision (without switching)
+jj file show -r <rev> **/*.md -T '"=== " ++ path ++ " ===\n"'  # Multiple files with path headers
 jj restore <path>                     # Discard changes to files
-jj restore --from <commit-id> <paths...> # Restore from another revision/commit, a previous state (commit) of the current revision, etc.
+jj restore --from <commit-id> <paths> # Restore from another revision/commit
 
-jj split -r <rev> <paths...> -m "text" # Split <rev> into two revisions, by giving a message for the first revision, and which changes (based on filepaths) should go into it
+jj split -r <rev> <paths> -m "text"   # Split into two revisions
+jj absorb                             # Auto-squash changes into ancestor commits
 
-jj rebase -s <src> -d <dest>          # Rebase with descendants onto <dest>
-jj rebase -r <rev> -d <dest>          # Rebase single revision only onto <dest>
+jj rebase -s <src> -o <dest>          # Rebase with descendants onto <dest>
+jj rebase -r <rev> -o <dest>          # Rebase single revision onto <dest>
+# NOTE: -d/--destination is deprecated, use -o/--onto instead
+
+jj file annotate <path>               # Blame: who changed each line
+jj bisect run -- <cmd>                # Binary search for bug-introducing commit
+```
+
+## Additional Commands
+
+```bash
+jj undo                               # Undo last operation (progressive - repeat to go further back)
+jj redo                               # Redo undone operation
+jj sign -r <rev>                      # Cryptographically sign commit
+jj unsign -r <rev>                    # Remove signature
+jj revert -r <rev>                    # Create commit that reverts changes (replaces old jj backout)
+jj tag set <name> -r <rev>            # Create/update local tag
+jj tag delete <name>                  # Delete local tag
+jj git colocation enable              # Convert to colocated repo
+jj git colocation disable             # Convert to non-colocated
 ```
 
 ## Quick Revset Reference
@@ -43,9 +68,16 @@ jj rebase -r <rev> -d <dest>          # Rebase single revision only onto <dest>
 ::@                                   # Ancestors
 @::                                   # Descendants
 mine()                                # Your changes
-conflict()                            # Has conflicts
-description(substring-i:"text")       # Match description (partial match, case-insensitive)
+conflicted()                          # Has conflicts (renamed from conflict() in v0.33)
+visible()                             # Visible revisions (built-in alias)
+hidden()                              # Hidden revisions (built-in alias)
+description(substring-i:"text")       # Match description (partial, case-insensitive)
+subject(substring:"text")             # Match first line only
+signed()                              # Cryptographically signed commits
 A | B, A & B, A ~ B                   # Union, intersection, difference
+change_id(prefix)                     # Explicit change ID prefix lookup
+parents(x, 2)                         # Parents with depth
+exactly(x, 3)                         # Assert exactly N revisions
 ```
 
 See `references/revsets.md` for comprehensive revset patterns.
@@ -70,6 +102,30 @@ jj new --no-edit parent -m "A"; jj new --no-edit parent -m "B"  # ✅ Both child
 
 ```bash
 jj log -r 'description(substring:"[todo]")'    # ✅
+```
+
+### 4. Use `-o`/`--onto` instead of `-d`/`--destination` (v0.36+)
+
+```bash
+jj rebase -s xyz -o main   # ✅ New syntax
+jj rebase -s xyz -d main   # ⚠️ Deprecated (still works but warns)
+```
+
+### 5. Symbol expressions are stricter (v0.32+)
+
+Revset symbols no longer resolve to multiple revisions:
+
+```bash
+jj log -r abc              # ❌ Error if 'abc' matches multiple change IDs
+jj log -r 'change_id(abc)' # ✅ Explicitly query by prefix
+jj log -r 'bookmarks(abc)' # ✅ For bookmark name patterns
+```
+
+### 6. Glob patterns are default in filesets (v0.36+)
+
+```bash
+jj diff 'src/*.rs'         # Matches glob pattern by default
+jj diff 'cwd:"src/*.rs"'   # Use cwd: prefix for literal path with special chars
 ```
 
 ## Scripts

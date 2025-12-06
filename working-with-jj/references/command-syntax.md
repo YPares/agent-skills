@@ -32,6 +32,24 @@ jj desc -r xyz
 jj log -r xyz
 ```
 
+## Commonly Used Short Flags
+
+```bash
+-G                        # Short for --no-graph (v0.35+)
+-o                        # Short for --onto (replaces -d in v0.36+)
+-f / -t                   # Short for --from / --to (various commands)
+```
+
+## Deprecated Flags (v0.36+)
+
+```bash
+# ❌ Old                  # ✅ New
+jj rebase -d main         → jj rebase -o main      # --onto replaces --destination
+jj split -d main          → jj split -o main
+jj revert -d main         → jj revert -o main
+jj describe --edit        → jj describe --editor   # --editor replaces --edit
+```
+
 ## Command Patterns
 
 ### Reading Revision Info

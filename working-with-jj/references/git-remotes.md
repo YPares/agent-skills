@@ -2,6 +2,9 @@
 
 JJ coexists with Git. The `.git` directory is the source of truth for remotes.
 
+**Note (v0.34+):** Git repositories are colocated by default (both `.jj` and `.git`).
+To disable: `git.colocate = false` in config.
+
 ## Basic Workflow
 
 ```bash
@@ -9,16 +12,21 @@ JJ coexists with Git. The `.git` directory is the source of truth for remotes.
 jj git fetch
 
 # 2. Rebase your work onto updated main
-jj rebase -d 'main@origin'
+jj rebase -o 'main@origin'    # Note: -o/--onto replaces -d in v0.36+
 
 # 3. Make changes...
 
 # 4. Point a bookmark at your work
 jj bookmark set my-feature -r @
 
-# 5. Push to remote
+# 5. Track before pushing (required for new bookmarks, v0.35+)
+jj bookmark track my-feature@origin
+
+# 6. Push to remote
 jj git push --bookmark my-feature
 ```
+
+**Note (v0.36+):** `jj git push --allow-new` is deprecated. Use `jj bookmark track` instead.
 
 ## Bookmarks vs Git Branches
 
@@ -110,14 +118,36 @@ jj git clone <url> [path]               # Clone Git repo into JJ
 
 ### Colocated Repos
 
-Colocated repos have both `.git` and `.jj` at the root (this is the default).
+Colocated repos have both `.git` and `.jj` at the root (default since v0.34).
 Git and JJ see the same history.
 
 ```bash
 # Convert existing Git repo to colocated JJ
 cd existing-git-repo
 jj git init --colocate
+
+# Convert between modes (v0.35+)
+jj git colocation enable      # Make colocated
+jj git colocation disable     # Make non-colocated
+jj git colocation status      # Check current mode
+
+# Clone without colocation
+jj git clone --no-colocate <url>
 ```
+
+**Config option:** `git.colocate = false` to disable default colocation.
+
+## Local Tags (v0.35+)
+
+JJ now supports local tag management (stored as lightweight Git tags):
+
+```bash
+jj tag set release-v1.0 -r @            # Create/update tag
+jj tag delete release-v1.0              # Delete tag
+jj tag list                             # List all tags
+```
+
+Tags are not automatically pushed; use `jj git push --tag <name>` to push.
 
 ## Import/Export
 
@@ -141,13 +171,14 @@ jj new 'main@origin' -m "Start feature X"
 
 ```bash
 jj git fetch
-jj rebase -s <feature-root> -d 'main@origin'
+jj rebase -s <feature-root> -o 'main@origin'    # -o replaces -d in v0.36+
 ```
 
-### Push new feature for review
+### Push new feature for review (v0.35+ workflow)
 
 ```bash
 jj bookmark create my-feature -r @
+jj bookmark track my-feature@origin     # Required before first push
 jj git push --bookmark my-feature
 ```
 
@@ -163,5 +194,19 @@ jj git push --bookmark my-feature
 
 ```bash
 jj bookmark delete my-feature
-jj git push --bookmark my-feature --allow-delete
+jj git push --bookmark my-feature --deleted    # --allow-delete also works
+```
+
+## Configuration Options
+
+```toml
+# In ~/.config/jj/config.toml or .jj/repo/config.toml
+
+[git]
+colocate = true                          # Default: colocate with Git (v0.34+)
+track-default-bookmark-on-clone = true   # Auto-track default branch (v0.30+)
+sign-on-push = true                      # Auto-sign commits when pushing (v0.26+)
+
+[remotes.origin]
+auto-track-bookmarks = true              # Auto-track bookmarks from this remote (v0.36+)
 ```
