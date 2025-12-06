@@ -108,7 +108,24 @@ When needing specialized functionality:
 2. Import with `#import "@preview/package:version"`
 3. Consult package documentation for API
 
-**Popular packages**: `cetz` (diagrams), `drafting` (annotations), `tablex` (tables), `codelst` (code listings)
+**Popular packages**:
+- `cetz` (diagrams)
+- `lilaq` (data visualization and plots)
+- `drafting` (annotations/comments for work-in-progress docs)
+- `gentle-clues` (callouts, tips, notes, admonitions)
+- `showybox` (general-purpose, customizable text boxes, with headers and footers. E.g. for definitions, theorems or highlighting important paragraphs)
+- `itemize` (nice layouts for item lists, enums, checklists, tree lists, etc.)
+- `polylux` (presentations, slides)
+- `suiji` (random number generation in Typst code)
+- `zebraw` (code listings with line numbers, highlighted lines, inlined Typst comments/explanations etc.)
+- `lovelace` (algorithms/pseudo-code)
+- `jlyfish` (Typst as a Julia notebook: embed Julia code inside Typst to generate content, visualizations etc.)
+- `pyrunner` (embed and call _non-I/O_ Python code inside Typst)
+- `chronos` (sequence diagrams)
+- `timeliney` (Gantt charts)
+- `herodot` (linear timelines)
+- `eqalc` (math equations to actual, callable Typst functions)
+- `conchord` (lyrics with overlayed chord changes, guitar shapes and tabs)
 
 ## Working with Templates
 
@@ -150,7 +167,7 @@ Typst Universe hosts many pre-built templates for reports, papers, CVs, presenta
 - Packages provide functions/components you call explicitly
 - Templates often have a title page and document structure built-in
 
-**Popular templates**: `charged-ieee` (IEEE papers), `bubble` (colorful reports), `modern-cv` (CVs), `polylux` (presentations)
+**Popular templates**: `charged-ieee` (IEEE papers), `bubble` (colorful reports), `modern-cv` (CVs)
 
 ## Bibliographies and Citations
 
