@@ -101,6 +101,19 @@
       "skills": [
         "./searxng-search"
       ]
+    },
+    {
+      "name": "postgresql-skills",
+      "description": "Skills for PostgreSQL development, including pgvector hybrid search with vector similarity and full-text search",
+      "source": "./",
+      "version": "1.0.0",
+      "homepage": "https://github.com/YPares/agent-skills",
+      "license": "MIT",
+      "keywords": ["postgresql", "pgvector", "vector-search", "hybrid-search", "rag", "bm25", "full-text-search"],
+      "strict": false,
+      "skills": [
+        "./pgvector-hybrid-search"
+      ]
     }
   ]
 }
