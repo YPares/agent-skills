@@ -145,14 +145,23 @@ Typst Universe hosts many pre-built templates for reports, papers, CVs, presenta
 
 **Example:**
 ```typst
-#import "@preview/bubble:0.2.2": *
+#import "@preview/bubble:0.2.2": bubble
+
+// Some templates (like bubble) don't use the standard metadata set by `#set document(...)` (for now?),
+// so we factor it out:
+#let doc-md = (
+  title: [My report],
+  author: "Claude",
+  date: datetime(year: 2025, month: 12, day: 8) // ALWAYS include explicit date in code (so we don't default to date of PDF build)
+)
+
+#set document(..doc-md)
 
 #show: bubble.with(
-  title: "My Report",
+  ..doc-md,
+  date: doc-md.date.display("[day]-[month]-[year]"), // some templates want a string here, not a `datetime` object, so we override date here
   subtitle: "A detailed analysis",
-  author: "Your Name",
   affiliation: "Your Organization",
-  date: datetime.today(),
   main-color: rgb("#FF6B35"),
   color-words: ("important", "key", "critical"),
 )
@@ -163,7 +172,7 @@ Typst Universe hosts many pre-built templates for reports, papers, CVs, presenta
 ```
 
 **Key differences from packages:**
-- Templates typically use `#show:` to apply styling to the entire document
+- Templates typically use `#show:` to apply styling to the entire document, via one single "main" function
 - Packages provide functions/components you call explicitly
 - Templates often have a title page and document structure built-in
 
@@ -175,9 +184,16 @@ Typst supports citations and bibliographies using BibTeX (.bib) or Hayagriva (.y
 
 See [references/bibliography.md](references/bibliography.md)
 
+**ALWAYS include proper URLs in the bibliography file AS MUCH AS POSSIBLE.**
+
+**ALWAYS include `@ref-name` citations in text WHEREVER A REF IS RELEVANT. A good bibliography is useless if not cited.**
+
 ## Complete Document Structure Patterns
 
-### Academic Paper / Report
+This shows an example for academic papers.
+Most reports you will have to write won't need to be that formal, but it's sort of the canonical example.
+
+### "Manual" layout (If needed, e.g. if the user gave specific layout requirements)
 
 ```typst
 #set document(
@@ -248,12 +264,21 @@ Your introduction text...
     Your abstract text here...
   ],
   index-terms: ("keyword1", "keyword2", "keyword3"),
-  bibliography: bibliography("refs.bib"),
+  bibliography: bibliography("refs.bib"), // the ieee template takes care of bibliography itself. That's not always the case
 )
 
 // Content starts immediately
 = Introduction
-Your paper content...
+Your introduction text...
+
+= Methods
+...
+
+= Results
+...
+
+= Conclusion
+...
 ```
 
 ## Troubleshooting
