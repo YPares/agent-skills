@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Update status flag in revision description
 # Usage: jj-flag-update <REV> <TO_FLAG>
-# TO_FLAG is: draft, todo, wip, untested, broken, review, blocked, or "done"
+# TO_FLAG is: draft, todo, wip, untested, standby, review, blocked, or "done"
 # Example: jj-flag-update @ wip
 # Example: jj-flag-update mxyz done
 #
@@ -11,7 +11,7 @@ set -euo pipefail
 
 if [[ $# -ne 2 ]]; then
   echo "Usage: jj-flag-update <REV> <TO_FLAG>" >&2
-  echo "Flags: draft, todo, wip, untested, broken, review, blocked, done" >&2
+  echo "Flags: draft, todo, wip, untested, standby, review, blocked, done" >&2
   exit 1
 fi
 
@@ -23,7 +23,7 @@ desc=$(jj log -r "$rev" -n1 --no-graph -T description)
 
 # Detect current flag
 current_flag=""
-for flag in draft todo wip untested broken review blocked done; do
+for flag in draft todo wip untested standby review blocked done; do
   if [[ "$desc" =~ ^\[task:${flag}\] ]]; then
     current_flag="$flag"
     break

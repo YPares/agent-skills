@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Find revisions with status flags
 # Usage: jj-find-flagged [FLAG]
-# FLAG: draft, todo, wip, untested, broken, review, blocked, done (omit for all)
+# FLAG: draft, todo, wip, untested, standby, review, blocked, done (omit for all)
 
 set -euo pipefail
 

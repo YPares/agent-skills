@@ -34,9 +34,10 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Check if current revision has a task flag
-current_desc=$(jj log -r @ -n1 --no-graph -T description)
+current_rev_id=$(jj log -r @ --no-graph -T change_id)
+current_desc=$(jj log -r @ --no-graph -T description)
 current_flag=""
-for flag in draft todo wip untested broken review blocked done; do
+for flag in draft todo wip untested standby review blocked "done"; do
     if [[ "$current_desc" =~ ^\[task:${flag}\] ]]; then
         current_flag="$flag"
         break
@@ -46,15 +47,10 @@ done
 # If no next_rev provided, enter review mode
 if [[ -z "$next_rev" ]]; then
     if [[ -n "$current_flag" && "$current_flag" != "done" ]]; then
-        echo "📋 Current task specs for review:"
+        echo "📋 Current task ($current_rev_id, currently $current_flag) specs for review:"
         echo "─────────────────────"
         echo "$current_desc"
         echo "─────────────────────"
-        echo ""
-        echo "Current task status: [task:$current_flag]"
-        echo "- Mark as [task:done] only if FULLY COMPLIANT with specs above"
-        echo "- Keep working on current task if something is left to do"
-        echo "- Remember that divergences with the specs MUST be documented (edit description to add Post-Implementation notes)"
         echo ""
     fi
 
@@ -90,8 +86,8 @@ if [[ -z "$next_rev" ]]; then
             [[ -z "$parent" ]] && continue
             parent_desc=$(jj log -r "$parent" --no-graph -T 'description.first_line()')
 
-            # Check if parent has a task flag that's not done
-            if [[ "$parent_desc" =~ ^\[task:(draft|todo|wip|untested|broken|review|blocked)\] ]]; then
+            # Check if parent has a flag that makes it unusable:
+            if [[ "$parent_desc" =~ ^\[task:(draft|todo|wip|blocked)\] ]]; then
                 all_parents_done=false
                 if [[ -n "$blocking_parents" ]]; then
                     blocking_parents="$blocking_parents, $parent"
@@ -122,16 +118,20 @@ if [[ -z "$next_rev" ]]; then
             echo "  $child_id  $child_desc"
         done
         echo ""
-        echo "Once you are SURE you are good to go, mark & transition to next task with:"
+        echo "Once you are SURE you are good to go, mark $current_rev_id & transition to next task with:"
         echo "  jj-todo-next --mark-as <new-status> <change-id>"
         echo ""
     else
         echo "NO CHILD TASK READY FOR WORK"
         echo ""
-        echo "  - Manually update flag with jj-flag-update"
+        echo "  - Manually update flag with \`jj-flag-update @ <new-status>\`"
         ecgo "  - Check remaining TODOs with jj-find-flagged or jj log"
-        echo ""
     fi
+
+    echo "  - Keep working on $current_rev_id if something is left to do"
+    echo "  - ALL divergences with the specs MUST be documented (edit description to add Post-Implementation notes)"
+    echo "  - Choose <new-status> appropriately, mark as [task:done] only if FULLY COMPLIANT with specs above"
+    echo ""
 
     if [[ ${#draft_children[@]} -gt 0 ]]; then
         echo "📝 Child tasks NOT ready (still draft):"

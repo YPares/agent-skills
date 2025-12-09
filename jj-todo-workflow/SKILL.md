@@ -52,26 +52,34 @@ jj-todo-next --mark-as done def456   # Marks abc123 as [task:done], starts def45
 
 We use description prefixes to track status at a glance. The `[task:*]` namespace makes them greppable and avoids conflicts with other conventions.
 
-| Flag | Meaning |
-|------|---------|
-| `[task:draft]` | Placeholder created, needs full specification |
-| `[task:todo]` | Not started, empty revision with complete specs |
-| `[task:wip]` | Work in progress |
-| `[task:untested]` | Implementation done, tests missing |
-| `[task:broken]` | Tests failing, needs fixing |
-| `[task:review]` | Needs review (tricky code, design choice) |
-| `[task:blocked]` | Waiting on external dependency |
-| `[task:done]` | Complete, all acceptance criteria met |
+Here are the ONLY allowed status flags:
+
+| Flag              | Meaning                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------ |
+| `[task:draft]`    | Placeholder created, needs full specification                                        |
+| `[task:todo]`     | Not started, empty revision with complete specs                                      |
+| `[task:wip]`      | Work in progress                                                                     |
+| `[task:blocked]`  | Waiting on external dependency                                                       |
+| `[task:standby]`  | Awaits some decision (broken and hard to fix, usefulness called into question, etc.) |
+| `[task:untested]` | Implementation done, but not tested enough to be validated                           |
+| `[task:review]`   | Needs review (tricky code, design choice)                                            |
+| `[task:done]`     | Complete, all acceptance criteria met                                                |
+
+This order is **indicative**: not every task has to go through all these steps, and not necessarily in the order above.
+
+NOTE: In previous versions of this Skill, `standby` was called "broken". It got renamed to make this status more broadly applicable.
 
 ### When to Use `draft` vs `todo` (Planners)
 
 **Use `[task:draft]`** when:
+
 - Creating placeholder tasks to establish the DAG structure
 - The task title/concept is clear but details aren't worked out yet
 - You want to defer writing full acceptance criteria
 - Planning at a high level before diving into specifics
 
 **Use `[task:todo]`** when:
+
 - The task has complete specifications (context, requirements, acceptance criteria)
 - A Worker could pick it up and implement it without clarification
 - All dependencies and approach are clearly documented
@@ -135,6 +143,7 @@ jj-flag-update @ untested
 `jj-todo-next` script is there to smooth out the "transition to next task" process.
 
 #### Without args
+
 - Print out current task's description so you can review and make sure everything is implemented as planned
 - Print out next possible task(s)
 
@@ -160,6 +169,7 @@ jj-todo-next
 ```
 
 #### With args
+
 - Update the flag of current task
 - Move (`jj edit`) to the next task
 - Update new task's flag to `[task:wip]`
@@ -189,6 +199,7 @@ jj new --no-edit <A-id> <B-id> <C-id> -m "[task:todo] Integration of widgets\n\n
 ```
 
 **Result:**
+
 ```
           Integration
        /      |        \
@@ -230,6 +241,7 @@ How to know when this is FULLY DONE (not just "good enough"):
 It should provide an agent with little context to have every information needed to start working without having to take last-minute decisions that should have been specified before.
 
 Avoid redundancy by linking whenever possible to:
+
 - pre-existing spec documents
 - relevant examples in the codebase
 
@@ -278,6 +290,7 @@ Running multiple agents concurrently on the same repository causes conflicts as 
 **IF** parallel work is truly needed, you must use JJ workspaces (equivalent to git worktrees) to isolate each agent.
 See `references/parallel-agents.md` for detailed guide on using JJ workspaces for parallel execution.
 However, **do not create workspaces** unless the human user explicitly agrees to it, as:
+
 - it adds significant complexity,
 - this part of the skill is still **beta**.
 
@@ -290,6 +303,7 @@ This way they can truly focus on the task they are given, and not be distracted 
 
 **Follow the prescribed workflow only.**
 If you encounter any issues, STOP and report to the user, notably if:
+
 - Made changes in wrong revision
 - Notice that previous work needs fixes and should be amended
 - Uncertain about how to proceed
@@ -333,12 +347,14 @@ When creating TODOs, always use `jj-todo-create` or `jj new --no-edit`.
 **Do NOT mark a task as done unless ALL acceptance criteria are met.**
 
 ✅ **Mark as done when:**
+
 - Every requirement implemented
 - All acceptance criteria pass
 - Tests pass (if applicable)
 - No known issues remain
 
 ❌ **Never mark as done when:**
+
 - "Good enough" or "mostly works"
 - Tests failing
 - Partial implementation
@@ -346,9 +362,11 @@ When creating TODOs, always use `jj-todo-create` or `jj new --no-edit`.
 - Planning to "come back to it later"
 
 **If incomplete:**
+
 - Use `--mark-as review` if needs feedback
 - Use `--mark-as blocked` if waiting on external dependency
 - Use `--mark-as untested` if some parts could not be tested for some reason
+- Use `--mark-as standby` for any other reason
 - Stay on `[task:wip]` and keep working
 
 ```bash
@@ -371,7 +389,7 @@ jj log -r 'ancestors(<rev-id>,2)'  # 2 for parents, 3 for parents + grandparents
 jj log -r 'descendants(<rev-id>,2)'  # 2 for children, 3 for children + grandchildren, etc.
 ```
 
-If any dependency (ancestor) has a `[task:*]` flag which is still `draft`, `todo`, `broken` or `wip`: STOP AND WARN THE USER. Wait for their approval before continuing.
+If any dependency (ancestor) has a `[task:*]` flag which is still `draft`, `todo`, `wip` or `blocked`: STOP AND WARN THE USER. Wait for their approval before continuing.
 
 **Note:** `jj-todo-next` checks dependencies automatically to indicate which children tasks aren't ready, but it's just here to smooth things out, not to abstract from `jj`. Inspect the graph yourself with `jj log` whenever needed.
 
@@ -379,18 +397,18 @@ If any dependency (ancestor) has a `[task:*]` flag which is still `draft`, `todo
 
 Helper scripts in `scripts/`. Invoke with full path to avoid PATH setup.
 
-| Script | Purpose |
-| ------ | ------- |
-| `jj-todo-create [--draft] <PARENT> <TITLE> [DESC]` | Create TODO (stays on @). Use --draft for placeholder tasks |
-| `jj-parallel-todos [--draft] <PARENT> <T1> <T2>...` | Create parallel TODOs. Use --draft for placeholder tasks |
-| `jj-todo-next [--mark-as STATUS] [REV]` | Review specs, check dependencies, mark & optionally move |
-| `jj-flag-update <REV> <TO_FLAG>` | Update status flag (auto-detects current) |
-| `jj-find-flagged [FLAG]` | Find flagged revisions |
+| Script                                              | Purpose                                                     |
+| --------------------------------------------------- | ----------------------------------------------------------- |
+| `jj-todo-create [--draft] <PARENT> <TITLE> [DESC]`  | Create TODO (stays on @). Use --draft for placeholder tasks |
+| `jj-parallel-todos [--draft] <PARENT> <T1> <T2>...` | Create parallel TODOs. Use --draft for placeholder tasks    |
+| `jj-todo-next [--mark-as STATUS] [REV]`             | Review specs, check dependencies, mark & optionally move    |
+| `jj-flag-update <REV> <TO_FLAG>`                    | Update status flag (auto-detects current)                   |
+| `jj-find-flagged [FLAG]`                            | Find flagged revisions                                      |
 
 **Additional useful scripts from the `working-with-jj` skill:**
 
-| Script | Purpose |
-| ------ | ------- |
+| Script               | Purpose                         |
+| -------------------- | ------------------------------- |
 | `jj-show-desc [REV]` | Print description of a revision |
 
 ## References
