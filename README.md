@@ -6,10 +6,17 @@ Various skills for AI agents (in claude skills format).
 
 ### Claude Code/Desktop
 
-Add this marketplace to Claude Code:
+**Step 1:** Add this marketplace to Claude Code:
 
 ```bash
-/plugin marketplace add YPares/agent-skills
+/plugin marketplace add ypares/agent-skills
+   # Lowercase here. GitHub is case-insensitive, claude marketplaces aren't
+```
+
+**Step 2:** Activate the plugins you want to use:
+
+```bash
+/plugin   # Opens a TUI to choose which ones to activate
 ```
 
 ### Other Agent Harnesses
