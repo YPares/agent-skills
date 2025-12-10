@@ -1,0 +1,65 @@
+#!/usr/bin/env nu
+# SearXNG search helper script
+# Usage: searx <query> [--category <cat>] [--limit <n>] [--engines <engine>]
+
+def main [
+  ...query: string,          # Search query
+  --category (-c): string = "general",  # Search category
+  --limit (-l): int = 10,    # Max results
+  --engines (-e): string,    # Specific engine(s) to use
+  --json,                    # Output raw JSON
+] {
+  let search_query = ($query | str join ' ')
+
+  if ($search_query | is-empty) {
+    print "Usage: searx <query> [--category <cat>] [--limit <n>] [--engines <engine>]"
+    print ""
+    print "Examples:"
+    print "  searx tokio --category cargo"
+    print "  searx 'machine learning' --category 'scientific publications'"
+    print "  searx express --category packages --engines npm"
+    return
+  }
+
+  mut url = $"http://localhost:8888/search?q=($search_query | url encode)&format=json"
+
+  if $category != "general" {
+    $url = $"($url)&categories=($category)"
+  }
+
+  if ($engines | is-not-empty) {
+    $url = $"($url)&engines=($engines)"
+  }
+
+  let response = (http get $url)
+
+  if $json {
+    $response | to json
+  } else {
+    let results = ($response | get results | first $limit)
+
+    if ($results | is-empty) {
+      print $"No results found for: ($search_query)"
+
+      if ($response.unresponsive_engines | is-not-empty) {
+        print $"\nUnresponsive engines: ($response.unresponsive_engines | str join ', ')"
+      }
+
+      if ($response.suggestions | is-not-empty) {
+        print $"\nSuggestions: ($response.suggestions | str join ', ')"
+      }
+    } else {
+      $results | each { |item|
+        print $"(ansi green)($item.title)(ansi reset)"
+        print $"  URL: (ansi blue)($item.url)(ansi reset)"
+        print $"  Engines: ($item.engines | str join ', ')"
+        if ($item.content | is-not-empty) {
+          print $"  ($item.content)"
+        }
+        print ""
+      }
+
+      print $"(ansi yellow)Showing ($results | length) of ($response.number_of_results) results(ansi reset)"
+    }
+  }
+}

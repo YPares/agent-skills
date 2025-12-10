@@ -88,6 +88,19 @@
       "skills": [
         "./typst-writer"
       ]
+    },
+    {
+      "name": "web-search-skills",
+      "description": "Skills for enhanced web and package repository search capabilities",
+      "source": "./",
+      "version": "1.0.0",
+      "homepage": "https://github.com/YPares/agent-skills",
+      "license": "MIT",
+      "keywords": ["search", "web-search", "searxng", "pypi", "npm", "cargo", "packages"],
+      "strict": false,
+      "skills": [
+        "./searxng-search"
+      ]
     }
   ]
 }
