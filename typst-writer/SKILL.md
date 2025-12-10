@@ -28,15 +28,45 @@ This skill provides guidance for writing correct Typst code, with emphasis on av
 ### Official Documentation
 
 - **Core language reference**: https://typst.app/docs/reference/
-- **Package search**: https://typst.app/universe/search?kind=packages&q=QUERY
-- **Template search**: https://typst.app/universe/search?kind=templates&q=QUERY
+- **Typst Universe** - Central package & template registry:
+  - main page (JS SPA): https://typst.app/universe
+  - whole registry is just a regular GitHub repo: https://github.com/typst/packages
+
+### Searching for Typst Packages
+
+**Typst Universe** (the official package registry) doesn't have a programmatic API, but you can search for packages via GitHub:
+- Most packages are hosted on GitHub
+- Use `gh search`, or SearXNG's repos search (see the `searxng-search` Skill)
+- Example: Search for "typst diagram" or "typst table" in repositories
+
+#### With GitHub CLI
+
+**Direct GitHub search examples:**
+```bash
+# Search for typst repos about some topic
+gh search repos --language "typst" --json "url,language,description" diagram arrows ... 
+
+# List all files in a given repo
+gh search code --repo "Jollywatt/typst-fletcher"
+
+# In a repo, search through all files of some type
+gh search code --repo "Jollywatt/typst-fletcher" --extension "md" arrow node ...
+```
+
+#### Via SearXNG
+
+**Requires `searxng-search` Skill**
+
+```bash
+curl "http://localhost:<searxng-port>/search?q=typst+diagram&format=json&categories=repos" | jq '.results[] | select(.engines[] == "github")'
+```
 
 ### When to Consult Documentation
 
 - Uncertain about function signatures or parameters
 - Need to verify syntax for less common features
 - Looking for built-in functions or methods
-- Exploring available packages (e.g., `cetz` for diagrams, `drafting` for margin notes, `tablex` for advanced tables)
+- Exploring available packages (e.g., `fletcher` for diagrams, `drafting` for margin notes, `tablex` for advanced tables)
 
 **Use WebFetch when needed** to retrieve current documentation for verification.
 
@@ -109,23 +139,26 @@ When needing specialized functionality:
 3. Consult package documentation for API
 
 **Popular packages**:
-- `cetz` (diagrams)
-- `lilaq` (data visualization and plots)
-- `drafting` (annotations/comments for work-in-progress docs)
-- `gentle-clues` (callouts, tips, notes, admonitions)
-- `showybox` (general-purpose, customizable text boxes, with headers and footers. E.g. for definitions, theorems or highlighting important paragraphs)
-- `itemize` (nice layouts for item lists, enums, checklists, tree lists, etc.)
-- `polylux` (presentations, slides)
-- `suiji` (random number generation in Typst code)
-- `zebraw` (code listings with line numbers, highlighted lines, inlined Typst comments/explanations etc.)
-- `lovelace` (algorithms/pseudo-code)
-- `jlyfish` (Typst as a Julia notebook: embed Julia code inside Typst to generate content, visualizations etc.)
-- `pyrunner` (embed and call _non-I/O_ Python code inside Typst)
-- `chronos` (sequence diagrams)
-- `timeliney` (Gantt charts)
-- `herodot` (linear timelines)
-- `eqalc` (math equations to actual, callable Typst functions)
-- `conchord` (lyrics with overlayed chord changes, guitar shapes and tabs)
+- `drafting`: annotations/comments for work-in-progress docs
+- `gentle-clues`: callouts, tips, notes, admonitions
+- `showybox`: general-purpose, customizable text boxes, with headers and footers. E.g. for definitions, theorems or highlighting important paragraphs
+- `itemize`: nice layouts for item lists, enums, checklists, tree lists, etc.
+- `cetz`: general diagrams/drawings, with explicit placing (coordinates) - basis of most Typst drawing libraries
+- `fletcher`: graphs, flowcharts, automata, trees, etc. - automatic placing
+- `chronos`: sequence diagrams
+- `timeliney`: Gantt charts
+- `herodot`: linear timelines
+- `lilaq`: data visualization and plots
+- `tablem`: write tables in markdown-like table format - easy control over strokes, merged cells...
+- `cmarker`: render Markdown (inlined or from separate file) as part as a Typst doc
+- `polylux`: presentations, slides
+- `suiji`: random number generation in Typst code
+- `zebraw`: code listings with line numbers, highlighted lines, inlined Typst comments/explanations etc.
+- `lovelace`: algorithms/pseudo-code
+- `conchord`: lyrics with overlayed chord changes, guitar shapes and tabs
+- `eqalc`: math equations to actual, callable Typst functions
+- `jlyfish`: Typst as a Julia notebook: embed Julia code inside Typst to generate content, visualizations etc.
+- `pyrunner`: embed and call _non-I/O_ Python code inside Typst
 
 ## Working with Templates
 
@@ -303,7 +336,7 @@ Common fixes:
 - **"expected content, found ..."**: You're using code where markup is expected - wrap in `#{ }` or use proper syntax
 - **"expected expression, found ..."**: Missing `#` prefix in markup context
 - **"unknown variable"**: Check spelling, ensure imports are correct
-- **Array/dictionary errors**: Review syntax - use `()` for both, dictionaries need `key: value`
+- **Array/dictionary errors**: Review syntax - use `()` for both, dictionaries need `key: value`, singleton arrays are `(elem,)`
 
 ### Performance Issues
 
