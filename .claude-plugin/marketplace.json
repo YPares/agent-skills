@@ -16,7 +16,13 @@
       "version": "1.0.0",
       "homepage": "https://github.com/YPares/agent-skills",
       "license": "MIT",
-      "keywords": ["jujutsu", "jj", "vcs", "version-control", "workflow"],
+      "keywords": [
+        "jujutsu",
+        "jj",
+        "vcs",
+        "version-control",
+        "workflow"
+      ],
       "strict": false,
       "skills": [
         "./working-with-jj",
@@ -30,7 +36,12 @@
       "version": "1.0.0",
       "homepage": "https://github.com/YPares/agent-skills",
       "license": "MIT",
-      "keywords": ["nix", "nixpkgs", "package-management", "npm"],
+      "keywords": [
+        "nix",
+        "nixpkgs",
+        "package-management",
+        "npm"
+      ],
       "strict": false,
       "skills": [
         "./nix-profile-manager",
@@ -44,7 +55,12 @@
       "version": "1.0.0",
       "homepage": "https://github.com/YPares/agent-skills",
       "license": "MIT",
-      "keywords": ["python", "textual", "tui", "terminal-ui"],
+      "keywords": [
+        "python",
+        "textual",
+        "tui",
+        "terminal-ui"
+      ],
       "strict": false,
       "skills": [
         "./textual-builder"
@@ -57,7 +73,13 @@
       "version": "1.0.0",
       "homepage": "https://github.com/YPares/agent-skills",
       "license": "MIT",
-      "keywords": ["nushell", "nu", "plugin", "rust", "shell"],
+      "keywords": [
+        "nushell",
+        "nu",
+        "plugin",
+        "rust",
+        "shell"
+      ],
       "strict": false,
       "skills": [
         "./nushell-usage",
@@ -71,7 +93,13 @@
       "version": "1.0.0",
       "homepage": "https://github.com/YPares/agent-skills",
       "license": "MIT",
-      "keywords": ["github", "git", "pr", "pull-request", "workflow"],
+      "keywords": [
+        "github",
+        "git",
+        "pr",
+        "pull-request",
+        "workflow"
+      ],
       "strict": false,
       "skills": [
         "./github-pr-workflow"
@@ -84,7 +112,12 @@
       "version": "1.0.0",
       "homepage": "https://github.com/YPares/agent-skills",
       "license": "MIT",
-      "keywords": ["typst", "document", "markup", "publishing"],
+      "keywords": [
+        "typst",
+        "document",
+        "markup",
+        "publishing"
+      ],
       "strict": false,
       "skills": [
         "./typst-writer"
@@ -97,10 +130,35 @@
       "version": "1.0.0",
       "homepage": "https://github.com/YPares/agent-skills",
       "license": "MIT",
-      "keywords": ["search", "web-search", "searxng", "pypi", "npm", "cargo", "packages"],
+      "keywords": [
+        "search",
+        "web-search",
+        "searxng",
+        "pypi",
+        "npm",
+        "cargo",
+        "packages"
+      ],
       "strict": false,
       "skills": [
         "./searxng-search"
+      ]
+    },
+    {
+      "name": "doc-reading-skills",
+      "description": "Skills for reading non-raw-text documents",
+      "source": "./",
+      "version": "1.0.0",
+      "homepage": "https://github.com/YPares/agent-skills",
+      "license": "MIT",
+      "keywords": [
+        "pdf",
+        "binary",
+        "document"
+      ],
+      "strict": false,
+      "skills": [
+        "./read-bin-docs"
       ]
     }
   ]
