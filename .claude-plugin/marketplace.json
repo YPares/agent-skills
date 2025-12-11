@@ -60,6 +60,7 @@
       "keywords": ["nushell", "nu", "plugin", "rust", "shell"],
       "strict": false,
       "skills": [
+        "./nushell-usage",
         "./nushell-plugin-builder"
       ]
     },
