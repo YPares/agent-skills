@@ -15,6 +15,11 @@ version_target: "0.36.x"
 - **Conflicts don't block** - resolve later
 - **Commits are lightweight** - edit freely
 - **Colocated by default** - Git repos have both `.jj` and `.git` (since v0.34)
+- **Three DSLs**:
+  - _revsets_: select across revisions - a revision (change) ID is a trivial but fully valid singleton revset
+  - _filesets_: select across files in the repository - a regular filepath is a trivial but fully valid singleton fileset
+  - _templates_: select which info to log and how to show it
+  - Many jj commands expect expressions using either of these DSLs, to select what to show/operate on
 
 ## Essential Commands
 
@@ -31,10 +36,10 @@ jj metaedit -r <rev> -m "text"        # Modify metadata (author, timestamps, des
 
 jj diff                               # Changes in @
 jj diff -r <rev>                      # Changes in revision
-jj file show -r <rev> <path>          # Show file contents at revision (without switching)
+jj file show -r <rev> <fileset>       # Show file contents at revision (without switching)
 jj file show -r <rev> **/*.md -T '"=== " ++ path ++ " ===\n"'  # Multiple files with path headers
-jj restore <path>                     # Discard changes to files
-jj restore --from <commit-id> <paths> # Restore from another revision/commit
+jj restore <fileset>                    # Discard changes to files
+jj restore --from <commit-id> <fileset> # Restore from another revision/commit
 
 jj split -r <rev> <paths> -m "text"   # Split into two revisions
 jj absorb                             # Auto-squash changes into ancestor commits
@@ -148,8 +153,11 @@ jj op restore <op-id>  # Restore the WHOLE repository (history included) to that
 
 ## References
 
-- `references/revsets.md` - Full revset syntax and patterns
-- `references/templates.md` - Template language and custom output
-- `references/git-remotes.md` - Bookmarks, push/fetch, remote workflows
+- The `jj` exe is self-documenting:
+  - Run `jj help -k bookmarks` - JJ bookmarks, how they relate to Git branches and how to push/fetch them from Git remotes
+  - Run `jj help -k revsets` - Revset DSL syntax and patterns
+  - Run `jj help -k filesets` - Filepath selection DSL, ie. how to tell jj commands to operate only on specific files
+  - Run `jj help -k templates` - Template language and custom output
+  - All jj subcommands have a pretty detailed `--help` page
 - `references/command-syntax.md` - Command flag details
-- `references/batch-operations.md` - Complex batch transformations
+- `references/batch-operations.md` - Complex batch transformations on revision descriptions
