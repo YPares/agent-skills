@@ -1,0 +1,24 @@
+# rigup configuration
+# Includes external riglets from rigup and local agent-skills riglets
+
+[rigs.default.riglets]
+# Include riglets from external flake inputs
+# rigup = []
+# Include riglets from local riglets/ folder
+self = [
+  "working-with-jj",
+  "jj-todo-workflow",
+  "cursor-agent-supervisor",
+  "github-pr-workflow",
+  "package-npm-nix",
+  "nushell-usage",
+  "nushell-plugin-builder",
+  "read-bin-docs",
+  "searxng-search",
+  "textual-builder",
+  "typst-writer",
+]
+
+# Optional: Add configuration for riglets that define options
+# [rigs.default.config.some-option]
+# value = "example"
