@@ -13,7 +13,9 @@
     in
     rigup { inherit inputs; }
     // {
-      # Make the rig directly buildable
-      packages.${system}.default = self.rigs.${system}.default.home;
+      packages.${system} = {
+        default = self.rigs.${system}.default.home;
+        complete = self.rigs.${system}.complete.home;
+      };
     };
 }
