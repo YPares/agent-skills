@@ -1,3 +1,4 @@
+_:
 {
   config.riglets.package-npm-nix = {
     meta = {

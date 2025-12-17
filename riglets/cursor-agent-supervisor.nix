@@ -1,3 +1,4 @@
+_:
 {
   config.riglets.cursor-agent-supervisor = {
     meta = {

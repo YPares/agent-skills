@@ -1,3 +1,4 @@
+_:
 { pkgs, ... }:
 {
   config.riglets.textual-builder = {

@@ -1,3 +1,4 @@
+_:
 { pkgs, ... }:
 {
   config.riglets.read-bin-docs = {

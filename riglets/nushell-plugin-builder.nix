@@ -1,6 +1,7 @@
+self:
 { pkgs, ... }:
 {
-  imports = [ ./nushell-usage.nix ];
+  imports = [ self.riglets.nushell-usage ];
 
   config.riglets.nushell-plugin-builder = {
     tools = [

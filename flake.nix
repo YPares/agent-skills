@@ -1,5 +1,5 @@
 {
-  description = "Minimal AI Agent Rig";
+  description = "YPares agent-skills in riglets form";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";

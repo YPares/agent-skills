@@ -1,3 +1,4 @@
+_:
 { pkgs, ... }:
 {
   config.riglets.working-with-jj = {

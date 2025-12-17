@@ -1,5 +1,6 @@
+self:
 {
-  imports = [ ./working-with-jj.nix ];
+  imports = [ self.riglets.working-with-jj ];
 
   config.riglets.jj-todo-workflow = {
     meta = {
