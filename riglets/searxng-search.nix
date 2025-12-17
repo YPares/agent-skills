@@ -10,6 +10,7 @@ _:
     meta = {
       name = "SearXNG Search";
       description = "Enhanced web and package repository search using local SearXNG instance";
+      intent = "toolbox";
       whenToUse = [
         "Searching package repositories (PyPI, NPM, Crates, etc.)"
         "Needing more powerful web search capabilities than WebSearch tool"

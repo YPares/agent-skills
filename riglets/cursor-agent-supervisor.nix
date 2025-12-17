@@ -4,6 +4,7 @@ _:
     meta = {
       name = "Cursor Agent Supervisor";
       description = "Offloading tasks with a well-defined scope to sub-agents, for instance to use a sub-agent to implement a set of specs";
+      intent = "playbook";
       whenToUse = [
         "Whenever a task should not need a broad knowledge of the whole project"
         "Supervising AI-assisted code generation"

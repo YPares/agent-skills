@@ -7,6 +7,7 @@ _:
     meta = {
       name = "Working with Jujutsu";
       description = "Expert guidance for using JJ (Jujutsu) version control system. Covers JJ commands, template system, evolog, operations log, and interoperability with git remotes.";
+      intent = "sourcebook";
       whenToUse = [
         "Learning Jujutsu version control basics"
         "Managing commits and changes with jj"

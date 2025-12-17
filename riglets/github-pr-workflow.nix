@@ -7,6 +7,7 @@ _:
     meta = {
       name = "GitHub PR Workflow";
       description = "Working with GitHub Pull Requests using the gh CLI. ";
+      intent = "playbook";
       whenToUse = [
         "Fetching PR details, review comments, CI status"
         "Understanding the difference between PR-level comments vs inline code review comments."

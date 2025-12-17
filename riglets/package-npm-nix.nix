@@ -4,6 +4,7 @@ _:
     meta = {
       name = "Package NPM with Nix";
       description = "Package npm/TypeScript/Bun CLI tools for Nix";
+      intent = "cookbook";
       whenToUse = [
         "Packaging Node.js applications with Nix"
         "Creating Nix derivations for npm packages"

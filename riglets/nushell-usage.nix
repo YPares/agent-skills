@@ -7,6 +7,7 @@ _:
     meta = {
       name = "Nushell Usage";
       description = "Essential patterns, idioms, and gotchas for writing Nushell code.";
+      intent = "cookbook";
       whenToUse = [
         "Writing Nushell scripts or libraries"
         "Working with Nushell's type system, pipelines, and data structures"
