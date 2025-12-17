@@ -1,6 +1,3 @@
-# rigup configuration
-# Includes external riglets from rigup and local agent-skills riglets
-
 [rigs.complete.riglets]
 # Include riglets from external flake inputs
 # rigup = []
