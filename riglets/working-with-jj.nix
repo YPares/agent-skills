@@ -1,8 +1,8 @@
 _:
-{ pkgs, ... }:
+{ pkgs, riglib, ... }:
 {
   config.riglets.working-with-jj = {
-    tools = [ pkgs.jujutsu ];
+    tools = [ pkgs.jujutsu ] ++ riglib.useScriptFolder ../working-with-jj/scripts;
 
     meta = {
       name = "Working with Jujutsu";

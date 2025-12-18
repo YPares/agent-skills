@@ -1,5 +1,6 @@
 _:
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   config.riglets.typst-writer = {
     tools = [ pkgs.typst ];
 

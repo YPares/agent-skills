@@ -5,6 +5,8 @@ _:
     tools = [
       pkgs.curl
       pkgs.podman
+      ../searxng-search/scripts/start-searxng
+      (pkgs.writeShellScriptBin "searx" "${pkgs.nushell}/bin/nu -n ${../searxng-search/scripts/searx}")
     ];
 
     meta = {

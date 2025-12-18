@@ -3,19 +3,24 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    rigup.url = "github:YPares/rigup.nix/dev";
+    rigup.url = "github:YPares/rigup.nix";
   };
 
   outputs =
     { self, rigup, ... }@inputs:
     let
       system = "x86_64-linux";
+      rigs = self.rigs.${system};
     in
     rigup { inherit inputs; }
     // {
       packages.${system} = {
-        default = self.rigs.${system}.default.home;
-        complete = self.rigs.${system}.complete.home;
+        default = rigs.default.home;
+        complete = rigs.complete.home;
+      };
+      devShells.${system} = {
+        default = rigs.default.shell;
+        complete = rigs.complete.shell;
       };
     };
 }

@@ -1,8 +1,11 @@
 self:
+{ riglib, ... }:
 {
   imports = [ self.riglets.working-with-jj ];
 
   config.riglets.jj-todo-workflow = {
+    tools = riglib.useScriptFolder ../jj-todo-workflow/scripts;
+
     meta = {
       name = "JJ TODO Workflow";
       description = "Structured TODO commit workflow using JJ (Jujutsu). Enforces completion discipline. Enables to divide work between Planners and Workers";

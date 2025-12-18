@@ -1,8 +1,8 @@
 _:
-{ pkgs, ... }:
+{ pkgs, riglib, ... }:
 {
   config.riglets.github-pr-workflow = {
-    tools = [ pkgs.gh ];
+    tools = [ pkgs.gh ] ++ riglib.useScriptFolder ../github-pr-workflow/scripts;
 
     meta = {
       name = "GitHub PR Workflow";
@@ -25,6 +25,8 @@ _:
       version = "0.1.0";
     };
 
-    docs = ../github-pr-workflow;
+    docs = riglib.writeFileTree {
+      "SKILL.md" = ../github-pr-workflow/SKILL.md;
+    };
   };
 }

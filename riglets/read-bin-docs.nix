@@ -2,7 +2,10 @@ _:
 { pkgs, ... }:
 {
   config.riglets.read-bin-docs = {
-    tools = [ pkgs.uv ];
+    tools = [
+      pkgs.uv
+      (pkgs.writeShellScriptBin "extract_pdf_text" "${pkgs.uv}/bin/uvx --from pypdf ${../read-bin-docs/scripts/extract_pdf_text.py}")
+    ];
 
     meta = {
       name = "Read Binary Docs";
