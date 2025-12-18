@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    rigup.url = "github:YPares/rigup.nix";
+    rigup.url = "github:YPares/rigup.nix/dev";
   };
 
   outputs =
