@@ -8,7 +8,6 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
     rigup.url = "github:YPares/rigup.nix";
   };
 
@@ -16,7 +15,6 @@
     {
       self,
       rigup,
-      flake-utils,
       nixpkgs,
       ...
     }@inputs:
@@ -24,22 +22,20 @@
       inherit inputs;
       checkRigs = true;
     }
-    // flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        rigs = self.rigs.${system};
-      in
-      {
-        # Make the rig(s) directly buildable
-        packages = nixpkgs.lib.mapAttrs' (name: rig: {
+    // (with nixpkgs.lib; {
+      packages = genAttrs systems.flakeExposed (
+        system:
+        mapAttrs' (name: rig: {
           name = "${name}-rig";
           value = rig.home;
-        }) rigs;
-        # Make the rig(s) exposable in sub shell
-        devShells = nixpkgs.lib.mapAttrs' (name: rig: {
+        }) self.rigs.${system}
+      );
+      devShells = genAttrs systems.flakeExposed (
+        system:
+        mapAttrs' (name: rig: {
           name = "${name}-rig";
           value = rig.shell;
-        }) rigs;
-      }
-    );
+        }) self.rigs.${system}
+      );
+    });
 }
