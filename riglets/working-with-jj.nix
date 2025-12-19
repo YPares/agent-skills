@@ -27,5 +27,9 @@ _:
     };
 
     docs = ../working-with-jj;
+
+    config-files = riglib.writeFileTree {
+      jj."config.toml" = ../.agent-space/jj-config.toml;
+    };
   };
 }
