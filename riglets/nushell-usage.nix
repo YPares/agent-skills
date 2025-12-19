@@ -1,5 +1,5 @@
 _:
-{ pkgs, ... }:
+{ pkgs, riglib, ... }:
 {
   config.riglets.nushell-usage = {
     tools = [ pkgs.nushell ];
@@ -27,5 +27,10 @@ _:
     };
 
     docs = ../nushell-usage;
+
+    config-files = riglib.writeFileTree {
+      # If does not exist, nu will try to create it and it will fail because in the rig, XDG_CONFIG_HOME is readonly
+      nushell."config.nu" = "";
+    };
   };
 }
