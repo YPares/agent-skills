@@ -20,7 +20,10 @@
       nixpkgs,
       ...
     }@inputs:
-    rigup { inherit inputs; }
+    rigup {
+      inherit inputs;
+      checkRigs = true;
+    }
     // flake-utils.lib.eachDefaultSystem (
       system:
       let
