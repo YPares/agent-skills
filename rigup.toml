@@ -1,30 +1,48 @@
-[rigs.complete.riglets]
+[rigs.claude-code.riglets]
 # Include riglets from external flake inputs
 # rigup = []
 # Include riglets from local riglets/ folder
 self = [
-  "cursor-agent-supervisor",
+  #"cursor-agent-supervisor",
   "github-pr-workflow",
+  "jj-todo-workflow",
   "nushell-plugin-builder",
+  "nushell-usage",
+  "package-npm-nix",
+  "read-bin-docs",
+  "searxng-search",
   "textual-builder",
   "typst-writer",
-  "package-npm-nix",
   "working-with-jj",
-  "jj-todo-workflow",
-  "nushell-usage",
-  "read-bin-docs",
-  "searxng-search",
 ]
 
-[rigs.default.riglets]
+[rigs.cursor-agent.riglets]
 self = [
-  "working-with-jj",
+  "cursor-agent-supervisor",
+  "github-pr-workflow",
   "jj-todo-workflow",
+  "nushell-plugin-builder",
   "nushell-usage",
+  "package-npm-nix",
   "read-bin-docs",
   "searxng-search",
+  "textual-builder",
+  "typst-writer",
+  "working-with-jj",
 ]
 
-# Optional: Add configuration for riglets that define options
-# [rigs.default.config.some-option]
-# value = "example"
+[rigs.copilot-cli.riglets]
+self = [
+  # "cursor-agent-supervisor",
+  # "github-pr-workflow",
+  "jj-todo-workflow",
+  "nushell-plugin-builder",
+  "nushell-usage",
+  "package-npm-nix",
+  "read-bin-docs",
+  "searxng-search",
+  "textual-builder",
+  "typst-writer",
+  "working-with-jj",
+]
+
