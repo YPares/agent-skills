@@ -1,9 +1,9 @@
 [rigs.claude-code.riglets]
 # Include riglets from external flake inputs
-# rigup = []
+rigup = ["agent-rig", "riglet-creator", "nix-module-system"]
 # Include riglets from local riglets/ folder
 self = [
-  #"cursor-agent-supervisor",
+  # "cursor-agent-supervisor",
   "github-pr-workflow",
   "jj-todo-workflow",
   "nushell-plugin-builder",
@@ -17,6 +17,7 @@ self = [
 ]
 
 [rigs.cursor-agent.riglets]
+rigup = ["agent-rig", "riglet-creator", "nix-module-system"]
 self = [
   "cursor-agent-supervisor",
   "github-pr-workflow",
@@ -32,6 +33,7 @@ self = [
 ]
 
 [rigs.copilot-cli.riglets]
+rigup = ["agent-rig", "riglet-creator", "nix-module-system"]
 self = [
   # "cursor-agent-supervisor",
   # "github-pr-workflow",
@@ -45,4 +47,3 @@ self = [
   "typst-writer",
   "working-with-jj",
 ]
-
