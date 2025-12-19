@@ -17,13 +17,26 @@
       self,
       rigup,
       flake-utils,
+      nixpkgs,
       ...
     }@inputs:
     rigup { inherit inputs; }
-    // flake-utils.lib.eachDefaultSystem (system: {
-      # Make the rig(s) directly buildable
-      packages = builtins.mapAttrs (_name: rig: rig.home) self.rigs.${system};
-      # Make the rig(s) exposable in sub shell
-      devShells = builtins.mapAttrs (_name: rig: rig.shell) self.rigs.${system};
-    });
+    // flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        rigs = self.rigs.${system};
+      in
+      {
+        # Make the rig(s) directly buildable
+        packages = nixpkgs.lib.mapAttrs' (name: rig: {
+          name = "${name}-rig";
+          value = rig.home;
+        }) rigs;
+        # Make the rig(s) exposable in sub shell
+        devShells = nixpkgs.lib.mapAttrs' (name: rig: {
+          name = "${name}-rig";
+          value = rig.shell;
+        }) rigs;
+      }
+    );
 }
