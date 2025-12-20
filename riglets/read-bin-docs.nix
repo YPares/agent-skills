@@ -8,7 +8,6 @@ _:
     ];
 
     meta = {
-      name = "Read Binary Docs";
       description = "Straightforward text extraction from document files (text-based PDF only for now, no OCR or docx)";
       intent = "toolbox";
       whenToUse = [

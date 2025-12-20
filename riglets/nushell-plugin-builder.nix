@@ -12,7 +12,6 @@ self:
     ];
 
     meta = {
-      name = "Nushell Plugin Builder";
       description = "Guide for creating Nushell plugins in Rust using nu_plugin and nu_protocol crates. Covers project setup, command implementation, streaming data, custom values, and testing.";
       intent = "cookbook";
       whenToUse = [

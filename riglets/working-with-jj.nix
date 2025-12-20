@@ -5,7 +5,6 @@ _:
     tools = [ pkgs.jujutsu ] ++ riglib.useScriptFolder ../working-with-jj/scripts;
 
     meta = {
-      name = "Working with Jujutsu";
       description = "Expert guidance for using JJ (Jujutsu) version control system. Covers JJ commands, template system, evolog, operations log, and interoperability with git remotes.";
       intent = "sourcebook";
       whenToUse = [

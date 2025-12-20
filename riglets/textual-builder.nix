@@ -8,7 +8,6 @@ _:
     ];
 
     meta = {
-      name = "Textual Builder";
       description = "Build Text User Interface (TUI) applications using the Textual Python framework (v0.86.0+)";
       intent = "cookbook";
       whenToUse = [

@@ -10,7 +10,6 @@ _:
     ];
 
     meta = {
-      name = "SearXNG Search";
       description = "Enhanced web and package repository search using local SearXNG instance";
       intent = "toolbox";
       whenToUse = [

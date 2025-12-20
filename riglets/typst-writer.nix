@@ -5,7 +5,6 @@ _:
     tools = [ pkgs.typst ];
 
     meta = {
-      name = "Typst Writer";
       description = "Write correct and idiomatic Typst code for document typesetting";
       intent = "cookbook";
       whenToUse = [

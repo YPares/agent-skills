@@ -5,7 +5,6 @@ _:
     tools = [ pkgs.gh ] ++ riglib.useScriptFolder ../github-pr-workflow/scripts;
 
     meta = {
-      name = "GitHub PR Workflow";
       description = "Working with GitHub Pull Requests using the gh CLI. ";
       intent = "playbook";
       whenToUse = [

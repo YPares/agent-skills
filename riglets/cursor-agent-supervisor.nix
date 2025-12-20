@@ -2,7 +2,6 @@ _:
 {
   config.riglets.cursor-agent-supervisor = {
     meta = {
-      name = "Cursor Agent Supervisor";
       description = "Offloading tasks with a well-defined scope to sub-agents, for instance to use a sub-agent to implement a set of specs";
       intent = "playbook";
       whenToUse = [
