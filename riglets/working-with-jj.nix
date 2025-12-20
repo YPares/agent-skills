@@ -1,6 +1,8 @@
-_:
-{ pkgs, riglib, ... }:
+self:
+{ config, pkgs, riglib, ... }:
 {
+  imports = [self.inputs.rigup.riglets.agent-identity];
+  
   config.riglets.working-with-jj = {
     tools = [ pkgs.jujutsu ] ++ riglib.useScriptFolder ../working-with-jj/scripts;
 
@@ -28,7 +30,12 @@ _:
     docs = ../working-with-jj;
 
     config-files = riglib.writeFileTree {
-      jj."config.toml" = ../.agent-space/jj-config.toml;
+      jj."config.toml" = (pkgs.formats.toml {}).generate "jj-config.toml" {
+        user.name = config.agent.identity.name;
+        user.email = config.agent.identity.email;
+        ui.editor = "TRIED_TO_RUN_AN_INTERACTIVE_EDITOR";
+        ui.diff-formatter = ":git";
+      };
     };
   };
 }
