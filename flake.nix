@@ -13,32 +13,14 @@
 
   outputs =
     {
-      self,
       rigup,
-      nixpkgs,
       ...
     }@inputs:
     rigup {
       inherit inputs;
       checkRigs = true;
     }
-    // (with nixpkgs.lib; {
-      packages = genAttrs systems.flakeExposed (
-        system:
-        mapAttrs' (name: rig: {
-          name = "${name}-rig";
-          value = rig.home;
-        }) self.rigs.${system}
-        // {
-          rigup = rigup.packages.${system}.rigup;
-        }
-      );
-      devShells = genAttrs systems.flakeExposed (
-        system:
-        mapAttrs' (name: rig: {
-          name = "${name}-rig";
-          value = rig.shell;
-        }) self.rigs.${system}
-      );
-    });
+    // {
+      packages = rigup.packages;
+    };
 }
