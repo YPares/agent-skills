@@ -9,6 +9,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     rigup.url = "github:YPares/rigup.nix";
+    nushellWith.url = "github:YPares/nushellWith";
   };
 
   outputs =

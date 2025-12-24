@@ -1,8 +1,11 @@
-_:
-{ pkgs, riglib, ... }:
+self:
+{ system, riglib, ... }:
+let
+  inherit (self.inputs.nushellWith.packages.${system}) nushellMCP;
+in
 {
   config.riglets.nushell-usage = {
-    tools = [ pkgs.nushell ];
+    tools = [ nushellMCP ];
 
     meta = {
       description = "Essential patterns, idioms, and gotchas for writing Nushell code.";

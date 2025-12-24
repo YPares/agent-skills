@@ -22,6 +22,21 @@
         "type": "github"
       }
     },
+    "crane": {
+      "locked": {
+        "lastModified": 1765145449,
+        "narHash": "sha256-aBVHGWWRzSpfL++LubA0CwOOQ64WNLegrYHwsVuVN7A=",
+        "owner": "ipetkov",
+        "repo": "crane",
+        "rev": "69f538cdce5955fcd47abfed4395dc6d5194c1c5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ipetkov",
+        "repo": "crane",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1766471942,
@@ -40,6 +55,22 @@
     },
     "nixpkgs_2": {
       "locked": {
+        "lastModified": 1765270179,
+        "narHash": "sha256-g2a4MhRKu4ymR4xwo+I+auTknXt/+j37Lnf0Mvfl1rE=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "677fbe97984e7af3175b6c121f3c39ee5c8d62c9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
+      "locked": {
         "lastModified": 1766025857,
         "narHash": "sha256-Lav5jJazCW4mdg1iHcROpuXqmM94BWJvabLFWaJVJp0=",
         "owner": "NixOS",
@@ -54,17 +85,72 @@
         "type": "github"
       }
     },
+    "nu-batteries-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1760054757,
+        "narHash": "sha256-pFKGR1QDKuLc8F53H5hQjP/+NeYPJpIu/MGCSjS3iLk=",
+        "owner": "nome",
+        "repo": "nu-batteries",
+        "rev": "187797585d9f4dd6a2b696d0572eb2b2f2aacd23",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nome",
+        "repo": "nu-batteries",
+        "type": "github"
+      }
+    },
+    "nushell-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1760528800,
+        "narHash": "sha256-8OMTscMObV+IOSgOoTSzJvZTz6q/l2AjrOb9y3p2tZY=",
+        "owner": "nushell",
+        "repo": "nushell",
+        "rev": "da141be11b3acaa55b39321e5f9651d02aa2ed6f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nushell",
+        "ref": "0.108.0",
+        "repo": "nushell",
+        "type": "github"
+      }
+    },
+    "nushellWith": {
+      "inputs": {
+        "crane": "crane",
+        "nixpkgs": "nixpkgs_2",
+        "nu-batteries-src": "nu-batteries-src",
+        "nushell-src": "nushell-src",
+        "webserver-nu-src": "webserver-nu-src"
+      },
+      "locked": {
+        "lastModified": 1765375483,
+        "narHash": "sha256-N8996ev+7scaPXQ8av/ppinC11NDLG5Ca3nxCge3Ftk=",
+        "owner": "YPares",
+        "repo": "nushellWith",
+        "rev": "396e89564030270f78d1371246c7e9897fa87b92",
+        "type": "github"
+      },
+      "original": {
+        "owner": "YPares",
+        "repo": "nushellWith",
+        "type": "github"
+      }
+    },
     "rigup": {
       "inputs": {
         "blueprint": "blueprint",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1766529792,
-        "narHash": "sha256-Lwf53Y9SEx9Rm6t7bYewBo1HlOm/kt1L5WTaAIXyPPo=",
+        "lastModified": 1766531695,
+        "narHash": "sha256-P5p45C2MY+Wbz8LQYEz/bONkVGI8ee0bXjy3TYKZc/Q=",
         "owner": "YPares",
         "repo": "rigup.nix",
-        "rev": "45b91cb1558aab0e589d2ae9ed8254858ca74a66",
+        "rev": "494662ab843e355cdab162362344fa88dec75ccf",
         "type": "github"
       },
       "original": {
@@ -76,6 +162,7 @@
     "root": {
       "inputs": {
         "nixpkgs": "nixpkgs",
+        "nushellWith": "nushellWith",
         "rigup": "rigup"
       }
     },
@@ -91,6 +178,22 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "webserver-nu-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1763371940,
+        "narHash": "sha256-/0O/uKJaecIEAO2B/fThNzn0WeD+zX4j+23HIlqA71s=",
+        "owner": "Jan9103",
+        "repo": "webserver.nu",
+        "rev": "0827c216101a541e73f2102603ea7f02c4d3e5c5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Jan9103",
+        "repo": "webserver.nu",
         "type": "github"
       }
     }

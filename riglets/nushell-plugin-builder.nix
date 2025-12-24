@@ -5,7 +5,6 @@ self:
 
   config.riglets.nushell-plugin-builder = {
     tools = [
-      pkgs.nushell
       pkgs.cargo
       pkgs.rustc
       (pkgs.writeShellScriptBin "init_plugin.py" ''${pkgs.python3}/bin/python3 ${../nushell-plugin-builder/scripts/init_plugin.py}'')
