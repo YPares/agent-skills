@@ -1,10 +1,8 @@
-[rigs.claude-code.riglets]
+[rigs.base.riglets]
 # Include riglets from external flake inputs
 rigup = ["agent-rig", "riglet-creator", "nix-module-system"]
 # Include riglets from local riglets/ folder
 self = [
-  # "cursor-agent-supervisor",
-  "github-pr-workflow",
   "jj-todo-workflow",
   "nushell-plugin-builder",
   "nushell-usage",
@@ -16,34 +14,12 @@ self = [
   "working-with-jj",
 ]
 
-[rigs.cursor-agent.riglets]
-rigup = ["agent-rig", "riglet-creator", "nix-module-system"]
-self = [
-  "cursor-agent-supervisor",
-  "github-pr-workflow",
-  "jj-todo-workflow",
-  "nushell-plugin-builder",
-  "nushell-usage",
-  "package-npm-nix",
-  "read-bin-docs",
-  "searxng-search",
-  "textual-builder",
-  "typst-writer",
-  "working-with-jj",
-]
+[rigs.claude]
+# Extend from a previously defined rig
+extends.self = "base"
+riglets.rigup = ["claude-code"]
+riglets.self = ["github-pr-workflow"]
 
-[rigs.copilot-cli.riglets]
-rigup = ["agent-rig", "riglet-creator", "nix-module-system"]
-self = [
-  # "cursor-agent-supervisor",
-  # "github-pr-workflow",
-  "jj-todo-workflow",
-  "nushell-plugin-builder",
-  "nushell-usage",
-  "package-npm-nix",
-  "read-bin-docs",
-  "searxng-search",
-  "textual-builder",
-  "typst-writer",
-  "working-with-jj",
-]
+[rigs.cursor]
+extends.self = "base"
+riglets.self = ["cursor-agent-supervisor", "github-pr-workflow"]
