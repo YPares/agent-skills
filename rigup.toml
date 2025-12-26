@@ -17,7 +17,7 @@ self = [
 [rigs.claude]
 # Extend from a previously defined rig
 extends.self = "base"
-riglets.rigup = ["claude-code"]
+riglets.rigup = ["claude-code-entrypoint"]
 riglets.self = ["github-pr-workflow"]
 
 [rigs.cursor]
