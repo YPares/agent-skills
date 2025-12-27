@@ -22,6 +22,6 @@
       checkRigs = true;
     }
     // {
-      packages = rigup.packages;
+      inherit (rigup) packages;
     };
 }
