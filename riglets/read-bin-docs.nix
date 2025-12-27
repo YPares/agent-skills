@@ -1,5 +1,5 @@
 _:
-{ pkgs, ... }:
+{ pkgs, riglib, ... }:
 {
   config.riglets.read-bin-docs = {
     tools = [
@@ -26,6 +26,6 @@ _:
       version = "0.1.0";
     };
 
-    docs = ../read-bin-docs;
+    docs = riglib.filterFileTree [ "md" ] ../read-bin-docs;
   };
 }

@@ -1,5 +1,5 @@
 self:
-{ pkgs, ... }:
+{ pkgs, riglib, ... }:
 {
   imports = [ self.riglets.nushell-usage ];
 
@@ -31,6 +31,6 @@ self:
       version = "0.1.0";
     };
 
-    docs = ../nushell-plugin-builder;
+    docs = riglib.filterFileTree [ "md" ] ../nushell-plugin-builder;
   };
 }

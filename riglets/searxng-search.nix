@@ -1,5 +1,5 @@
 _:
-{ pkgs, ... }:
+{ pkgs, riglib, ... }:
 {
   config.riglets.searxng-search = {
     tools = [
@@ -30,6 +30,6 @@ _:
       version = "0.1.0";
     };
 
-    docs = ../searxng-search;
+    docs = riglib.filterFileTree [ "md" ] ../searxng-search;
   };
 }

@@ -27,6 +27,6 @@ self:
       version = "0.1.0";
     };
 
-    docs = ../jj-todo-workflow;
+    docs = riglib.filterFileTree ["md"] ../jj-todo-workflow;
   };
 }

@@ -1,8 +1,13 @@
 self:
-{ config, pkgs, riglib, ... }:
 {
-  imports = [self.inputs.rigup.riglets.agent-identity];
-  
+  config,
+  pkgs,
+  riglib,
+  ...
+}:
+{
+  imports = [ self.inputs.rigup.riglets.agent-identity ];
+
   config.riglets.working-with-jj = {
     tools = [ pkgs.jujutsu ] ++ riglib.useScriptFolder ../working-with-jj/scripts;
 
@@ -27,10 +32,10 @@ self:
       version = "0.1.0";
     };
 
-    docs = ../working-with-jj;
+    docs = riglib.filterFileTree [ "md" ] ../working-with-jj;
 
     config-files = riglib.writeFileTree {
-      jj."config.toml" = (pkgs.formats.toml {}).generate "jj-config.toml" {
+      jj."config.toml" = (pkgs.formats.toml { }).generate "jj-config.toml" {
         user.name = config.agent.identity.name;
         user.email = config.agent.identity.email;
         ui.editor = "TRIED_TO_RUN_AN_INTERACTIVE_EDITOR";

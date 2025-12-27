@@ -24,8 +24,6 @@ _:
       version = "0.1.0";
     };
 
-    docs = riglib.writeFileTree {
-      "SKILL.md" = ../github-pr-workflow/SKILL.md;
-    };
+    docs = riglib.filterFileTree ["md"] ../github-pr-workflow;
   };
 }
