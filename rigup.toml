@@ -1,6 +1,6 @@
 [rigs.base.riglets]
 # Include riglets from external flake inputs
-rigup = ["agent-rig", "riglet-creator", "nix-module-system"]
+rigup = ["agent-rig-system", "riglet-creator", "nix-module-system"]
 # Include riglets from local riglets/ folder
 self = [
   "jj-todo-workflow",
