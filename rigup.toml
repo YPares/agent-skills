@@ -1,8 +1,14 @@
 [rigs.base.riglets]
-# Include riglets from external flake inputs
-rigup = ["agent-rig-system", "riglet-creator", "nix-module-system"]
-# Include riglets from local riglets/ folder
-self = [
+rigup = ["git-setup", "agent-rig-system", "riglet-creator", "nix-module-system"]
+self = ["working-with-jj"]
+
+[rigs.default]
+extends.self = "base"
+riglets.rigup = ["claude-code-entrypoint"]
+
+[rigs.all-skills]
+extends.self = "base"
+riglets.self = [
   "jj-todo-workflow",
   "nushell-plugin-builder",
   "nushell-usage",
@@ -11,15 +17,13 @@ self = [
   "searxng-search",
   "textual-builder",
   "typst-writer",
-  "working-with-jj",
 ]
 
-[rigs.claude]
-# Extend from a previously defined rig
-extends.self = "base"
+[rigs.all-skills-claude]
+extends.self = "all-skills"
 riglets.rigup = ["claude-code-entrypoint"]
 riglets.self = ["github-pr-workflow"]
 
-[rigs.cursor]
-extends.self = "base"
+[rigs.all-skills-cursor]
+extends.self = "all-skills"
 riglets.self = ["cursor-agent-supervisor", "github-pr-workflow"]
