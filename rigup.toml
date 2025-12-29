@@ -2,10 +2,6 @@
 rigup = ["git-setup", "agent-rig-system", "riglet-creator", "nix-module-system"]
 self = ["working-with-jj"]
 
-[rigs.default]
-extends.self = "base"
-riglets.rigup = ["claude-code-entrypoint"]
-
 [rigs.all-skills]
 extends.self = "base"
 riglets.self = [
