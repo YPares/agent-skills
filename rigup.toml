@@ -17,7 +17,7 @@ riglets.self = [
 
 [rigs.all-skills-claude]
 extends.self = "all-skills"
-riglets.rigup = ["claude-code-entrypoint"]
+riglets.rigup = ["claude-code"]
 riglets.self = ["github-pr-workflow"]
 
 [rigs.all-skills-cursor]
