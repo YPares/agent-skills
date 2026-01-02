@@ -13,7 +13,7 @@ self:
 
     meta = {
       description = "Expert guidance for using JJ (Jujutsu) version control system. Covers JJ commands, template system, evolog, operations log, and interoperability with git remotes.";
-      intent = "sourcebook";
+      intent = "cookbook";
       whenToUse = [
         "Learning Jujutsu version control basics"
         "Managing commits and changes with jj"
@@ -28,7 +28,7 @@ self:
         "vcs"
         "git"
       ];
-      status = "experimental";
+      status = "stable";
       version = "0.1.0";
     };
 

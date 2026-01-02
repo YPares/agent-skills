@@ -24,7 +24,7 @@ in
         "script"
         "structured-data"
       ];
-      status = "experimental";
+      status = "stable";
       version = "0.1.0";
     };
 
