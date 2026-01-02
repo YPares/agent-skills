@@ -1,10 +1,8 @@
-[rigs.base.riglets]
+# A rig of skills not dependent on a given harness
+[rigs.general-skills.riglets]
 rigup = ["git-setup", "agent-rig-system", "riglet-creator", "nix-module-system"]
-self = ["working-with-jj"]
-
-[rigs.all-skills]
-extends.self = "base"
-riglets.self = [
+self = [
+  "working-with-jj",
   "jj-todo-workflow",
   "nushell-plugin-builder",
   "nushell-usage",
@@ -15,11 +13,18 @@ riglets.self = [
   "typst-writer",
 ]
 
-[rigs.all-skills-claude]
-extends.self = "all-skills"
+[rigs.claude-rig]
+extends.self = "general-skills"
 riglets.rigup = ["claude-code"]
 riglets.self = ["github-pr-workflow"]
 
-[rigs.all-skills-cursor]
-extends.self = "all-skills"
+[rigs.copilot-rig]
+extends.self = "general-skills"
+riglets.rigup = ["copilot-cli"]
+# copilot-cli already comes with the GitHub MCP server tools, thus it doesn't need github-pr-workflow
+
+[rigs.cursor-rig]
+extends.self = "general-skills"
 riglets.self = ["cursor-agent-supervisor", "github-pr-workflow"]
+# cursor-agent doesn't have a way to start a sub-agent, but it can be taught to "emulate" this
+# by calling itself recursively
