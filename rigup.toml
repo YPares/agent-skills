@@ -2,6 +2,8 @@
 [rigs.general-skills.riglets]
 rigup = ["git-setup", "agent-rig-system", "riglet-creator", "nix-module-system"]
 self = [
+  "agent-tool-design",
+  "context-engineering-fundamentals",
   "working-with-jj",
   "jj-todo-workflow",
   "nushell-plugin-builder",

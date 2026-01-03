@@ -10,6 +10,10 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     rigup.url = "github:YPares/rigup.nix";
     nushellWith.url = "github:YPares/nushellWith";
+    agent-skills-context-eng = {
+      url = "github:muratcankoylan/Agent-Skills-for-Context-Engineering";
+      flake = false;
+    };
   };
 
   outputs =
