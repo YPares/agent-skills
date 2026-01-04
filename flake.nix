@@ -23,7 +23,7 @@
     }@inputs:
     rigup {
       inherit inputs;
-      checkRigs = true;
+      checkRiglets = true;
     }
     // {
       inherit (rigup) packages;
