@@ -2,14 +2,17 @@ _:
 { pkgs, riglib, ... }:
 {
   config.riglets.github-pr-workflow = {
-    tools = [ pkgs.gh ] ++ riglib.useScriptFolder ../github-pr-workflow/scripts;
+    # These tools are to be used _unwrapped_:
+    # they will _not_ see the rig's XDG_CONFIG_HOME, they are to _directly_
+    # use the user's config files (notably to reuse their stored GitHub auth tokens)
+    tools.unwrapped = [ pkgs.gh ] ++ riglib.useScriptFolder ../github-pr-workflow/scripts;
 
     meta = {
-      description = "Working with GitHub Pull Requests using the gh CLI. ";
+      description = "Working with GitHub Pull Requests using the gh CLI";
       intent = "playbook";
       whenToUse = [
         "Fetching PR details, review comments, CI status"
-        "Understanding the difference between PR-level comments vs inline code review comments."
+        "Understanding the difference between PR-level comments vs inline code review comments"
         "Working with GitHub API"
       ];
       keywords = [

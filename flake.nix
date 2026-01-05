@@ -24,6 +24,7 @@
     rigup {
       inherit inputs;
       checkRiglets = true;
+      checkRigs = true;
     }
     // {
       inherit (rigup) packages;

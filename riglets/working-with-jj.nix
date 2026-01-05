@@ -40,6 +40,7 @@ self:
         user.email = config.agent.identity.email;
         ui.editor = "TRIED_TO_RUN_AN_INTERACTIVE_EDITOR";
         ui.diff-formatter = ":git";
+        ui.default-command = "log";
       };
     };
   };
