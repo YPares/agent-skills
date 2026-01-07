@@ -24,7 +24,7 @@ This guide explains how AI agents (like Claude) can use SearXNG for enhanced sea
 ```bash
 # Check if running
 curl -sf http://localhost:8888/ > /dev/null || \
-  ./searxng-search/scripts/start-searxng --detach
+  start-searxng --detach
 ```
 
 **When to start:**
@@ -53,7 +53,7 @@ curl -s "http://localhost:8888/search?q=tokio&format=json&categories=cargo" | \
 
 **Option B: Nushell helper (formatted output)**
 ```bash
-./searxng-search/scripts/searx "tokio" --category cargo --limit 5
+searx "tokio" --category cargo --limit 5
 ```
 
 ### 4. Parse and Present Results
@@ -146,7 +146,7 @@ curl -s "http://localhost:8888/search?q=rust+async+await&format=json&categories=
 ```bash
 if ! curl -sf http://localhost:8888/ > /dev/null 2>&1; then
   echo "Starting SearXNG..."
-  ./searxng-search/scripts/start-searxng --detach
+  start-searxng --detach
 fi
 ```
 
@@ -195,7 +195,7 @@ podman logs searxng
 
 # Restart
 podman stop searxng
-./searxng-search/scripts/start-searxng --detach
+start-searxng --detach
 ```
 
 ### Empty Results

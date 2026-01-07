@@ -16,14 +16,14 @@ Enhanced web and package repository search capabilities using SearXNG metasearch
 
 **1. Start SearXNG:**
 ```bash
-./searxng-search/scripts/start-searxng --detach
+start-searxng --detach
 ```
 
 **2. Use the search helper:**
 ```bash
-./searxng-search/scripts/searx "tokio" --category cargo
-./searxng-search/scripts/searx "express" --category packages
-./searxng-search/scripts/searx "rust async" --category it --limit 5
+searx "tokio" --category cargo
+searx "express" --category packages
+searx "rust async" --category it --limit 5
 ```
 
 **3. Or use curl directly:**

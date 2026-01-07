@@ -16,7 +16,7 @@ SearXNG is a privacy-respecting metasearch engine that you can run locally. It a
 
 **Start SearXNG:**
 ```bash
-./searxng-search/scripts/start-searxng --detach
+start-searxng --detach
 ```
 
 This will:
@@ -32,7 +32,7 @@ podman stop searxng  # or: docker stop searxng
 
 **Custom port:**
 ```bash
-./searxng-search/scripts/start-searxng --port 9999 --detach
+start-searxng --port 9999 --detach
 ```
 
 ## Quick Reference
@@ -227,7 +227,7 @@ curl -s "http://localhost:8888/search?q=flask&format=json&engines=pypi" | jq .
 The `start-searxng` script creates a minimal configuration automatically:
 
 ```bash
-./searxng-search/scripts/start-searxng --help
+start-searxng --help
 ```
 
 Default config includes:
@@ -239,7 +239,7 @@ Default config includes:
 ### Using Your Own Config
 
 ```bash
-./searxng-search/scripts/start-searxng --config /path/to/your/config/dir
+start-searxng --config /path/to/your/config/dir
 ```
 
 Your config directory should contain `settings.yml`.
