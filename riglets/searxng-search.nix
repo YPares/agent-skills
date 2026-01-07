@@ -3,6 +3,7 @@ _:
 {
   config.riglets.searxng-search = {
     tools = [
+      pkgs.jq
       pkgs.curl
       pkgs.podman
       ../searxng-search/scripts/start-searxng
