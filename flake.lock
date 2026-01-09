@@ -236,14 +236,15 @@
       },
       "locked": {
         "lastModified": 1767986225,
-        "narHash": "sha256-oPYi8CoLX9LLIkYCp2zsrHauFj1sGEkCvRTHFyTuZjU=",
+        "narHash": "sha256-Bb8K+/5/XdTCsSW6cg1Np/Ai00TW7I9FX5cUnkbq99I=",
         "owner": "YPares",
         "repo": "rigup.nix",
-        "rev": "d199160a014604679306018013e93dd2ee48186d",
+        "rev": "68e5813568c76e4d3c729d74af4c10641c10e9e3",
         "type": "github"
       },
       "original": {
         "owner": "YPares",
+        "ref": "mcp",
         "repo": "rigup.nix",
         "type": "github"
       }
