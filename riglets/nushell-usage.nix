@@ -30,7 +30,7 @@ in
 
     docs = ../nushell-usage;
 
-    config-files = riglib.writeFileTree {
+    configFiles = riglib.writeFileTree {
       # If does not exist, nu will try to create it and it will fail because in the rig, XDG_CONFIG_HOME is readonly
       nushell."config.nu" = "";
     };

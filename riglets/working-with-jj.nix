@@ -34,7 +34,7 @@ self:
 
     docs = riglib.filterFileTree [ "md" ] ../working-with-jj;
 
-    config-files = riglib.writeFileTree {
+    configFiles = riglib.writeFileTree {
       jj."config.toml" = (pkgs.formats.toml { }).generate "jj-config.toml" {
         user.name = config.agent.identity.name;
         user.email = config.agent.identity.email;
