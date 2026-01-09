@@ -235,15 +235,16 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1768656821,
-        "narHash": "sha256-u8itC+p96Vk0/orvieOfibb9LnP/MrOXfuxqFCneoNU=",
+        "lastModified": 1768656828,
+        "narHash": "sha256-ye3FvRIrri6b83kDX7SqKtZbxnTu4h1IV3BJ7YIB5NA=",
         "owner": "YPares",
         "repo": "rigup.nix",
-        "rev": "bd9fa3796af5f41dac5a73958c3d78b4fd5e2d09",
+        "rev": "6f688318b466a56b9b02752432467c8a02daa78f",
         "type": "github"
       },
       "original": {
         "owner": "YPares",
+        "ref": "mcp",
         "repo": "rigup.nix",
         "type": "github"
       }
