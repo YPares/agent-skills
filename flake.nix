@@ -23,6 +23,7 @@
     }@inputs:
     rigup {
       inherit inputs;
+      projectUri = "YPares/agent-skills";
       checkRiglets = true;
       checkRigs = true;
     }
