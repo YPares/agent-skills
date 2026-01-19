@@ -11,8 +11,8 @@ _:
       description = "Working with GitHub Pull Requests using the gh CLI";
       intent = "playbook";
       whenToUse = [
-        "Fetching PR details, review comments, CI status"
-        "Understanding the difference between PR-level comments vs inline code review comments"
+        "WHENEVER THE USER ASKS YOU to fetch PR details, review comments, CI status"
+        "Needing to obtain BOTH PR-level comments and inline code review comments"
         "Working with GitHub API"
       ];
       keywords = [
