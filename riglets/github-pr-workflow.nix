@@ -30,14 +30,17 @@ _:
 
     promptCommands = {
       study-pr-comments = {
-        description = "Study comments from PR(s) passed as $ARGUMENTS";
+        description = "Study comments from PR(s) given as $ARGUMENTS";
         template = ''
-          Using tools and instructions from github-pr-workflow riglet (notably tools `gh-pr-reviews` and `gh-pr-review-comments`), fetch all the comments of PR(s) $ARGUMENTS and analyze them:
+          **First, read riglet `github-pr-workflow`.**
+          Then using its tools and instructions (notably tools `gh-pr-reviews` and `gh-pr-review-comments`), fetch all the comments of PR(s) $ARGUMENTS and analyze them:
 
           - how relevant they are (critical, spot-on, useful, nitpick, off-topic...) 
           - how applicable they are, given the intended scope of the PR(s) (immediately, with some effort, not without massive rework...)
 
-          Then suggest a short plan for how to address them or part of them.
+          PAY ATTENTION to whether comments are already resolved or not, and to whether you are correctly getting the inline code comments too (that's what the aforementioned tools are for).
+          
+          Give your report, then suggest a short plan for what should be done next.
           If any information you need (notably intended PR scope) is missing, ask the user.
         '';
       };
