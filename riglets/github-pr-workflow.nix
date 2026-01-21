@@ -20,13 +20,27 @@ _:
         "git"
         "pull-request"
         "pr"
-        "workflow"
-        "automation"
+        "review"
       ];
       status = "stable";
       version = "0.1.0";
     };
 
-    docs = riglib.filterFileTree ["md"] ../github-pr-workflow;
+    docs = riglib.filterFileTree [ "md" ] ../github-pr-workflow;
+
+    promptCommands = {
+      study-pr-comments = {
+        description = "Study comments from PR $1";
+        template = ''
+          Using tools and instructions from github-pr-workflow riglet (notably tools `gh-pr-reviews` and `gh-pr-review-comments`), fetch all the comments of PR $1 and analyze them:
+
+          - how relevant they are (critical, spot-on, useful, nitpick, off-topic...) 
+          - how applicable they are, given the intended scope of the PR (immediately, with some effort, not without massive rework...)
+
+          Then suggest a short plan for how to address them or part of them.
+          If any information you need (notably intended PR scope) is missing, ask the user.
+        '';
+      };
+    };
   };
 }
