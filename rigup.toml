@@ -28,6 +28,6 @@ riglets.rigup = ["copilot-cli"]
 [rigs.cursor-rig]
 extends.self = "general-skills"
 riglets.self = ["cursor-agent-supervisor", "github-pr-workflow"]
-riglets.rigup = ["cursor-agent"]
 # cursor-agent doesn't have a way to start a sub-agent, but it can be taught to "emulate" this
 # by calling itself recursively
+riglets.rigup = ["cursor"]
