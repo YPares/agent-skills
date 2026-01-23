@@ -32,8 +32,7 @@ _:
       study-pr-comments = {
         description = "Study comments from PR(s) given as $ARGUMENTS";
         template = ''
-          **First, read riglet `github-pr-workflow`.**
-          Then using its tools and instructions (notably tools `gh-pr-reviews` and `gh-pr-review-comments`), fetch all the comments of PR(s) $ARGUMENTS and analyze them:
+          Fetch all the comments of PR(s) $ARGUMENTS and analyze them:
 
           - how relevant they are (critical, spot-on, useful, nitpick, off-topic...) 
           - how applicable they are, given the intended scope of the PR(s) (immediately, with some effort, not without massive rework...)
