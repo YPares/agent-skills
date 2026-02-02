@@ -16,7 +16,7 @@ in
   };
 
   config.riglets.nushell-usage = {
-    tools = [ nushellMCP ];
+    tools.unwrapped = [ nushellMCP ];
 
     meta = {
       description = "Essential patterns, idioms, and gotchas for writing Nushell code.";
@@ -40,15 +40,10 @@ in
     };
 
     docs = ../nushell-usage;
-
-    configFiles = riglib.writeFileTree {
-      # If does not exist, nu will try to create it and it will fail because in the rig, XDG_CONFIG_HOME is readonly
-      nushell."config.nu" = "";
-    };
-  }
-  // lib.optionalAttrs config.nushell-usage.withMcp {
-    mcpServers.nushell.command = pkgs.writeShellScriptBin "nu-mcp" ''
-      ${lib.getExe nushellMCP} --mcp "$@"
-    '';
   };
+}
+// lib.optionalAttrs config.nushell-usage.withMcp {
+  config.mcpServers.nushell.command = pkgs.writeShellScriptBin "nu-mcp" ''
+    ${lib.getExe nushellMCP} --mcp "$@"
+  '';
 }
