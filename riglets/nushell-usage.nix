@@ -41,9 +41,10 @@ in
 
     docs = ../nushell-usage;
   };
-}
-// lib.optionalAttrs config.nushell-usage.withMcp {
-  config.mcpServers.nushell.command = pkgs.writeShellScriptBin "nu-mcp" ''
-    ${lib.getExe nushellMCP} --mcp "$@"
-  '';
+
+  config.mcpServers = lib.optionalAttrs config.nushell-usage.withMcp {
+    nushell.command = pkgs.writeShellScriptBin "nu-mcp" ''
+      ${lib.getExe nushellMCP} --mcp "$@"
+    '';
+  };
 }
