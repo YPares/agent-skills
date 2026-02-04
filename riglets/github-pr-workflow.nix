@@ -32,13 +32,13 @@ _:
       study-pr-comments = {
         description = "Study comments from PR(s) given as $ARGUMENTS";
         template = ''
-          Fetch all the comments of PR(s) $ARGUMENTS and analyze them:
+          Fetch all the UNRESOLVED comments of PR(s) $ARGUMENTS and analyze them:
 
           - how relevant they are (critical, spot-on, useful, nitpick, off-topic...) 
           - how applicable they are, given the intended scope of the PR(s) (immediately, with some effort, not without massive rework...)
 
-          PAY ATTENTION to whether comments are already resolved or not, and to whether you are correctly getting the inline code comments too (that's what the aforementioned tools are for).
-          
+          Use `gh-pr-info` which automatically filters out already resolved comments using GitHub's GraphQL API.
+
           Give your report, then suggest a short plan for what should be done next.
           If any information you need (notably intended PR scope) is missing, ask the user.
         '';

@@ -20,26 +20,27 @@ GitHub PRs have **two different types of comments**:
 
 | Script | Purpose |
 |--------|---------|
-| `gh-pr-review-comments <PR>` | Get inline code review comments (the ones `gh` misses!) |
-| `gh-pr-summary <PR>` | PR title, description, state, branches |
-| `gh-pr-reviews <PR>` | Review decisions (approved/changes requested) |
-| `gh-pr-checks <PR>` | CI check status |
+| `gh-pr-info <PR> [REPO]` | **Comprehensive PR info**: summary, CI checks and unresolved review and inline comments |
 
-All scripts auto-detect the repo from git remote, or accept `[REPO]` as second arg.
+The script auto-detects the repo from git remote, or accepts `[REPO]` as second argument (format: `owner/repo`).
+
+**Key features**:
+- Uses GitHub's GraphQL API to reliably filter out already resolved/addressed comments
+- Excludes collapsed/hidden review threads
+- Excludes minimized comments (marked as spam/off-topic/resolved)
+- Excludes dismissed reviews
+- Shows only what still needs attention
 
 ## Common Commands
 
 ```bash
-# Basic PR info
+# Get complete PR info with UNRESOLVED comments only
+gh-pr-info <PR> [REPO]             # ✅ Everything you need: summary, checks, reviews, unresolved comments
+
+# Basic PR info (native gh commands)
 gh pr view <PR>                    # Overview
 gh pr view <PR> --comments         # PR-level comments only (NOT inline!)
 gh pr diff <PR>                    # View the diff
-
-# Review comments (inline) - USE THE SCRIPT
-gh-pr-review-comments <PR>         # ✅ Gets inline code review comments
-
-# Or manually via API
-gh api repos/OWNER/REPO/pulls/PR/comments | jq '.[] | {path, line, body}'
 
 # Reviews (approve/request changes)
 gh pr review <PR> --approve
@@ -74,8 +75,5 @@ gh api repos/OWNER/REPO/pulls/PR/files
 
 ## Workflow: Addressing Review Comments
 
-1. **Get the comments**: `gh-pr-review-comments <PR>`
+1. **Get unresolved comments**: `gh-pr-info <PR>`
 2. **Make fixes** in your local branch
-3. **Push** (if using JJ: `jj git push`)
-4. **Reply to comments** on GitHub or via API
-5. **Re-request review** if needed: `gh pr edit <PR> --add-reviewer <USER>`

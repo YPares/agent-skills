@@ -1,0 +1,165 @@
+#!/usr/bin/env bash
+# Get comprehensive PR information: summary, checks, reviews, and UNRESOLVED inline comments
+# Usage: gh-pr-info <PR_NUMBER> [REPO]
+#
+# This script combines all PR information in one place and filters out already addressed comments
+
+set -euo pipefail
+
+PR_NUMBER="${1:?Usage: gh-pr-info <PR_NUMBER> [REPO]}"
+REPO="${2:-}"
+
+if [[ -z "$REPO" ]]; then
+  REPO=$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null || true)
+  if [[ -z "$REPO" ]]; then
+    echo "Error: Could not detect repo. Provide REPO as second argument" >&2
+    exit 1
+  fi
+fi
+
+# Extract owner and repo name
+OWNER=$(echo "$REPO" | cut -d'/' -f1)
+REPO_NAME=$(echo "$REPO" | cut -d'/' -f2)
+
+echo "═══════════════════════════════════════════════════════════════════════"
+echo "                              PR SUMMARY"
+echo "═══════════════════════════════════════════════════════════════════════"
+echo
+
+# PR Summary
+gh api "repos/${REPO}/pulls/${PR_NUMBER}" | jq -r '
+"PR #\(.number): \(.title)
+State: \(.state) | Mergeable: \(.mergeable // "unknown") | Draft: \(.draft)
+Author: \(.user.login)
+Branch: \(.head.ref) → \(.base.ref)
+Created: \(.created_at | split("T")[0])
+URL: \(.html_url)
+
+─── Description ───
+\(.body // "(no description)")"'
+
+echo
+echo "═══════════════════════════════════════════════════════════════════════"
+echo "                               CI CHECKS"
+echo "═══════════════════════════════════════════════════════════════════════"
+echo
+
+# Get the head SHA first
+HEAD_SHA=$(gh api "repos/${REPO}/pulls/${PR_NUMBER}" --jq '.head.sha')
+
+# CI Checks
+CHECKS=$(gh api "repos/${REPO}/commits/${HEAD_SHA}/check-runs" | jq -r '
+  .check_runs[] |
+  "\(if .conclusion == "success" then "✓" elif .conclusion == "failure" then "✗" elif .status == "in_progress" then "⋯" else "?" end) \(.name): \(.conclusion // .status)"')
+
+if [[ -n "$CHECKS" ]]; then
+  echo "$CHECKS"
+else
+  echo "(no checks found)"
+fi
+
+echo
+echo "═══════════════════════════════════════════════════════════════════════"
+echo "                              REVIEWS"
+echo "═══════════════════════════════════════════════════════════════════════"
+echo
+
+# Reviews (excluding PENDING, DISMISSED, and minimized/hidden reviews)
+# Use GraphQL timeline API to get isMinimized status which REST API doesn't provide
+#
+# Filters applied:
+# - state != "PENDING": Not yet submitted
+# - state != "DISMISSED": Explicitly dismissed
+# - isMinimized == false: Not hidden/minimized (with reasons like spam/off-topic/resolved/etc)
+REVIEWS=$(gh api graphql -f query="
+query {
+  repository(owner: \"${OWNER}\", name: \"${REPO_NAME}\") {
+    pullRequest(number: ${PR_NUMBER}) {
+      timelineItems(first: 100, itemTypes: PULL_REQUEST_REVIEW) {
+        nodes {
+          ... on PullRequestReview {
+            state
+            author {
+              login
+            }
+            body
+            submittedAt
+            isMinimized
+            minimizedReason
+          }
+        }
+      }
+    }
+  }
+}" | jq -r '
+  .data.repository.pullRequest.timelineItems.nodes[] |
+  select(.state != "PENDING" and .state != "DISMISSED" and .isMinimized == false) |
+  "\(.author.login): \(.state) (\(.submittedAt | split("T")[0]))\(if .body != "" then "\n  \(.body)" else "" end)"')
+
+if [[ -n "$REVIEWS" ]]; then
+  echo "$REVIEWS"
+else
+  echo "(no reviews submitted)"
+fi
+
+echo
+echo "═══════════════════════════════════════════════════════════════════════"
+echo "                    UNRESOLVED INLINE REVIEW COMMENTS"
+echo "═══════════════════════════════════════════════════════════════════════"
+echo
+
+# Use GraphQL to get review threads with resolution status
+# This is the ONLY reliable way to distinguish resolved from unresolved comments
+#
+# Filters applied:
+# - isResolved == false: Thread not marked as resolved
+# - isCollapsed == false: Thread not collapsed/hidden
+# - isMinimized == false: Individual comment not minimized (spam/off-topic/resolved/etc)
+UNRESOLVED=$(gh api graphql -f query="
+query {
+  repository(owner: \"${OWNER}\", name: \"${REPO_NAME}\") {
+    pullRequest(number: ${PR_NUMBER}) {
+      reviewThreads(first: 100) {
+        nodes {
+          isResolved
+          isOutdated
+          isCollapsed
+          comments(first: 50) {
+            nodes {
+              author {
+                login
+              }
+              body
+              createdAt
+              path
+              line
+              isMinimized
+              minimizedReason
+            }
+          }
+        }
+      }
+    }
+  }
+}" | jq -r '
+  .data.repository.pullRequest.reviewThreads.nodes[] |
+  # Filter: only show threads that are NOT resolved AND NOT collapsed
+  select(.isResolved == false and .isCollapsed == false) |
+  .comments.nodes[] |
+  # Also filter out minimized comments (hidden/spam/off-topic/etc)
+  select(.isMinimized == false) |
+  "───────────────────────────────────────────────────────────────────────
+File: \(.path):\(.line // "N/A")
+Author: \(.author.login) (\(.createdAt | split("T")[0]))
+───────────────────────────────────────────────────────────────────────
+\(.body)
+"')
+
+if [[ -n "$UNRESOLVED" ]]; then
+  echo "$UNRESOLVED"
+else
+  echo "(no unresolved inline comments)"
+fi
+
+echo
+echo "═══════════════════════════════════════════════════════════════════════"
