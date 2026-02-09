@@ -5,11 +5,24 @@ self:
   riglib,
   ...
 }:
+let
+  jj = riglib.wrapWithEnv {
+    name = "jj-wrapped";
+    tools = [ pkgs.jujutsu ];
+    env.JJ_CONFIG = riglib.toTOML {
+      user.name = config.agent.identity.name;
+      user.email = config.agent.identity.email;
+      ui.editor = "TRIED_TO_RUN_AN_INTERACTIVE_EDITOR";
+      ui.diff-formatter = ":git";
+      ui.default-command = "log";
+    };
+  };
+in
 {
   imports = [ self.inputs.rigup.riglets.agent-identity ];
 
   config.riglets.working-with-jj = {
-    tools = [ pkgs.jujutsu ] ++ riglib.useScriptFolder ../working-with-jj/scripts;
+    tools.unwrapped = [ jj ] ++ riglib.useScriptFolder ../working-with-jj/scripts;
 
     meta = {
       description = "Expert guidance for using JJ (Jujutsu) version control system. Covers JJ commands, template system, evolog, operations log, and interoperability with git remotes.";
@@ -34,14 +47,5 @@ self:
 
     docs = riglib.filterFileTree [ "md" ] ../working-with-jj;
 
-    configFiles = riglib.writeFileTree {
-      jj."config.toml" = (pkgs.formats.toml { }).generate "jj-config.toml" {
-        user.name = config.agent.identity.name;
-        user.email = config.agent.identity.email;
-        ui.editor = "TRIED_TO_RUN_AN_INTERACTIVE_EDITOR";
-        ui.diff-formatter = ":git";
-        ui.default-command = "log";
-      };
-    };
   };
 }
