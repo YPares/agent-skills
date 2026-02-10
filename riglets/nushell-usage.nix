@@ -1,7 +1,6 @@
 self:
 {
   system,
-  riglib,
   pkgs,
   lib,
   config,
@@ -12,7 +11,7 @@ let
 in
 {
   options.nushell-usage = {
-    withMcp = riglib.options.flag "Add the nushell MCP server to the rig";
+    withMcp = lib.mkEnableOption "Add the nushell MCP server to the rig";
   };
 
   config.riglets.nushell-usage = {
