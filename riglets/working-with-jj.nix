@@ -47,5 +47,14 @@ in
 
     docs = riglib.filterFileTree [ "md" ] ../working-with-jj;
 
+    promptCommands = {
+      review-revset = {
+        description = "Review revset passed as $1, focusing on $2";
+        template = ''
+          Review JJ revset '$1', focusing on the following aspects:
+          $2
+        '';
+      };
+    };
   };
 }
