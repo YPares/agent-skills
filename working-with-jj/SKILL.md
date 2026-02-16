@@ -35,7 +35,8 @@ jj desc -r <rev> -m "text"            # Set description
 jj metaedit -r <rev> -m "text"        # Modify metadata (author, timestamps, description)
 
 jj diff                               # Changes in @
-jj diff -r <rev>                      # Changes in revision
+jj diff -r <revset>                   # Changes in revset (need to be contiguous)
+jj diff -f <rev1> -t <rev2>           # Differences between two states
 jj file show -r <rev> <fileset>       # Show file contents at revision (without switching)
 jj file show -r <rev> **/*.md -T '"=== " ++ path ++ " ===\n"'  # Multiple files with path headers
 jj restore <fileset>                    # Discard changes to files
