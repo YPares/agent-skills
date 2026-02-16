@@ -48,10 +48,19 @@ in
     docs = riglib.filterFileTree [ "md" ] ../working-with-jj;
 
     promptCommands = {
+      summarize-revset = {
+        description = "Summarize revset passed as $1";
+        template = ''
+          Summarize the changes made by JJ revset '$1'. Don't forget to read commit messages to have the context.
+          Do not split your summary commit per commit, provide a high-level overview.
+          Do **not** try to explain why these changes have been made **unless** this information is explicitly provided by commit messages or comments in code.
+        '';
+      };
+      
       review-revset = {
         description = "Review revset passed as $1, focusing on $2";
         template = ''
-          Review JJ revset '$1', focusing on the following aspects:
+          Review JJ revset '$1' (both diffs and commit messages), focusing on the following aspects:
           $2
         '';
       };
