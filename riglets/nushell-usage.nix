@@ -5,10 +5,16 @@ self:
   config,
   ...
 }:
+let
+  cfg = config.nushell-usage;
+in
 {
   imports = [ self.inputs.rigup.riglets.lsp-servers ];
 
-  options.nushell-usage.withMcp = lib.mkEnableOption "Add the nushell MCP server to the rig";
+  options.nushell-usage = {
+    nushellPkg = lib.mkPackageOption pkgs "nushell" { };
+    withMcp = lib.mkEnableOption "Add the nushell MCP server to the rig";
+  };
 
   config.riglets.nushell-usage = {
     tools.unwrapped = [ pkgs.nushell ];
@@ -39,14 +45,14 @@ self:
 
   config.lspServers = lib.optionalAttrs config.lspServersEnabled {
     nushell.command = pkgs.writeShellScriptBin "nu-mcp" ''
-      ${lib.getExe pkgs.nushell} --lsp "$@"
+      ${lib.getExe cfg.nushellPkg} --lsp "$@"
     '';
     nushell.extensions = [ ".nu" ];
   };
 
-  config.mcpServers = lib.optionalAttrs config.nushell-usage.withMcp {
+  config.mcpServers = lib.optionalAttrs cfg.withMcp {
     nushell.command = pkgs.writeShellScriptBin "nu-mcp" ''
-      ${lib.getExe pkgs.nushell} --mcp "$@"
+      ${lib.getExe cfg.nushellPkg} --mcp "$@"
     '';
   };
 }
