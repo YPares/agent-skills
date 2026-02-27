@@ -1,21 +1,17 @@
 self:
 {
-  system,
   pkgs,
   lib,
   config,
   ...
 }:
-let
-  inherit (self.inputs.nushellWith.packages.${system}) nushellMCP;
-in
 {
   options.nushell-usage = {
     withMcp = lib.mkEnableOption "Add the nushell MCP server to the rig";
   };
 
   config.riglets.nushell-usage = {
-    tools.unwrapped = [ nushellMCP ];
+    tools.unwrapped = [ pkgs.nushell ];
 
     meta = {
       description = "Essential patterns, idioms, and gotchas for writing Nushell code.";
@@ -43,7 +39,7 @@ in
 
   config.mcpServers = lib.optionalAttrs config.nushell-usage.withMcp {
     nushell.command = pkgs.writeShellScriptBin "nu-mcp" ''
-      ${lib.getExe nushellMCP} --mcp "$@"
+      ${lib.getExe pkgs.nushell} --mcp "$@"
     '';
   };
 }
