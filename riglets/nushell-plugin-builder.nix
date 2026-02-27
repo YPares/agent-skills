@@ -1,13 +1,15 @@
 self:
-{ pkgs, riglib, ... }:
+{ pkgs, lib, riglib, ... }:
 {
   imports = [ self.riglets.nushell-usage ];
 
   config.riglets.nushell-plugin-builder = {
-    tools = [
-      pkgs.cargo
-      pkgs.rustc
-      (pkgs.writeShellScriptBin "init_plugin.py" ''${pkgs.python3}/bin/python3 ${../nushell-plugin-builder/scripts/init_plugin.py}'')
+    tools = with pkgs; [
+      cargo
+      rustc
+      (writeShellScriptBin "init-plugin" ''
+        ${lib.getExe python3} ${../nushell-plugin-builder/scripts/init_plugin.py}
+      '')
     ];
 
     meta = {
