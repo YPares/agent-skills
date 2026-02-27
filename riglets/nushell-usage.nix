@@ -6,9 +6,9 @@ self:
   ...
 }:
 {
-  options.nushell-usage = {
-    withMcp = lib.mkEnableOption "Add the nushell MCP server to the rig";
-  };
+  imports = [ self.inputs.rigup.riglets.lsp-servers ];
+
+  options.nushell-usage.withMcp = lib.mkEnableOption "Add the nushell MCP server to the rig";
 
   config.riglets.nushell-usage = {
     tools.unwrapped = [ pkgs.nushell ];
@@ -35,6 +35,13 @@ self:
     };
 
     docs = ../nushell-usage;
+  };
+
+  config.lspServers = lib.optionalAttrs config.lspServersEnabled {
+    nushell.command = pkgs.writeShellScriptBin "nu-mcp" ''
+      ${lib.getExe pkgs.nushell} --lsp "$@"
+    '';
+    nushell.extensions = [ ".nu" ];
   };
 
   config.mcpServers = lib.optionalAttrs config.nushell-usage.withMcp {
