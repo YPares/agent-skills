@@ -10,7 +10,7 @@ _:
     tools = [ pkgs.zellij ];
     meta = {
       intent = "playbook";
-      description = "How to maintain Zellij tab/pane names up to date";
+      description = "Rename Zellij tab to reflect current work";
       whenToUse = [
         "Running inside Zellij terminal multiplexer"
       ];
@@ -19,24 +19,26 @@ _:
     };
     docs = riglib.writeFileTree {
       "SKILL.md" = ''
-        # Zellij Tab/Pane Name Management
+        # Zellij Tab Name Management
 
-        The commands to run are:
+        If the $ZELLIJ env var is defined, it means you are running inside zellij.
 
-        - `zellij action rename-pane "..."`
-        - `zellij action rename-tab "..."`
+        The commands to run is `zellij action rename-tab "..."`
 
-        ## When to rename the Tab
+        Group both into one call to avoid back-and-forth. E.g.:
 
-        At the beginning of the conversation, using the following convention: `[<issue_number>:]<label>` where:
-          - `issue_number` is only the numeric part of some issue identifier (without prefix) if you have any
+        ```bash
+        [ -n "$ZELLIJ" ] && zellij action rename-tab "..." || echo "Not in zellij"
+        ```
+
+        ## When to rename the tab
+
+        At the beginning of the conversation or when resuming a conversation, using the following convention: `[<issue_number>:]<label>`.
+        Where:
+          - `issue_number` is the numeric part of some issue identifier (without prefix) if you have any
           - `label` is a 1 or 2 word description of the task at hand (using dash as separator)
 
-        You can rename several times if you get new information, but besides that the tab name is not dynamic.
-
-        ## When to rename the Pane
-
-        The pane name is to be trated more dynamically and should represent a short description of the current step you are currently undergoing. It can be a few words long.
+        You can rename several times if you get new information, but besides that the tab name is not supposed to be dynamic.
       '';
     };
   };
