@@ -33,6 +33,6 @@ self:
       version = "1.0.0";
     };
 
-    docs = self.inputs.agent-skills-context-eng.claudePlugins.agent-architecture.skills.tool-design.source;
+    docs = self.inputs.agent-skills-context-eng.claudePlugins.context-engineering.skills.tool-design.source;
   };
 }

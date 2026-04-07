@@ -69,7 +69,7 @@ self:
       # Import full skills as subdirectories to preserve their internal structure
       references = pkgs.lib.mapAttrs (
         _: val: val.source
-      ) self.inputs.agent-skills-context-eng.claudePlugins.context-engineering-fundamentals.skills;
+      ) self.inputs.agent-skills-context-eng.claudePlugins.context-engineering.skills;
     };
   };
 }
