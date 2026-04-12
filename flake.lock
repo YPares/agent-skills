@@ -3,11 +3,11 @@
     "agent-skills-context-eng": {
       "flake": false,
       "locked": {
-        "lastModified": 1775743305,
-        "narHash": "sha256-0s5OnasKfdZSCXb+XkIkG08XbBlIhiw3WKzkH02hlCA=",
+        "lastModified": 1775953441,
+        "narHash": "sha256-jMPQUzPpDrDY03mxotVf6YKWIedOkIO29Rk/HM0NfXE=",
         "owner": "muratcankoylan",
         "repo": "Agent-Skills-for-Context-Engineering",
-        "rev": "401f3dde9653c4fabb4f74d566969c0a6310ab6b",
+        "rev": "e1eec6990a7380ab97a201e498bc661d3f5ba026",
         "type": "github"
       },
       "original": {
@@ -162,11 +162,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1775763530,
-        "narHash": "sha256-BuTK9z1QEwWPOIakQ1gCN4pa4VwVJpfptYCviy2uOGc=",
+        "lastModified": 1775888245,
+        "narHash": "sha256-nwASzrRDD1JBEu/o8ekKYEXm/oJW6EMCzCRdrwcLe90=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "b0188973b4b2a5b6bdba8b65381d6cd09a533da0",
+        "rev": "13043924aaa7375ce482ebe2494338e058282925",
         "type": "github"
       },
       "original": {
