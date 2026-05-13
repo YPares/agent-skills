@@ -106,8 +106,8 @@
       ]
     },
     {
-      "name": "typst-skills",
-      "description": "Skills for creating documents with Typst markup language",
+      "name": "research-skills",
+      "description": "Skills for conducting reseatch and creating documents with Typst markup language",
       "source": "./",
       "version": "1.0.0",
       "homepage": "https://github.com/YPares/agent-skills",
@@ -116,21 +116,7 @@
         "typst",
         "document",
         "markup",
-        "publishing"
-      ],
-      "strict": false,
-      "skills": [
-        "./typst-writer"
-      ]
-    },
-    {
-      "name": "web-search-skills",
-      "description": "Skills for enhanced web and package repository search capabilities",
-      "source": "./",
-      "version": "1.0.0",
-      "homepage": "https://github.com/YPares/agent-skills",
-      "license": "MIT",
-      "keywords": [
+        "publishing",
         "search",
         "web-search",
         "searxng",
@@ -141,24 +127,10 @@
       ],
       "strict": false,
       "skills": [
-        "./searxng-search"
-      ]
-    },
-    {
-      "name": "doc-reading-skills",
-      "description": "Skills for reading non-raw-text documents",
-      "source": "./",
-      "version": "1.0.0",
-      "homepage": "https://github.com/YPares/agent-skills",
-      "license": "MIT",
-      "keywords": [
-        "pdf",
-        "binary",
-        "document"
-      ],
-      "strict": false,
-      "skills": [
-        "./read-bin-docs"
+        "./research-assistant",
+        "./searxng-search",
+        "./read-bin-docs",
+        "./typst-writer"
       ]
     }
   ]
