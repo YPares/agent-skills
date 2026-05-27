@@ -3,11 +3,11 @@
     "agent-skills-context-eng": {
       "flake": false,
       "locked": {
-        "lastModified": 1779423580,
-        "narHash": "sha256-aAG60lp8W4WgQFPMe3AZj4fHlwbl/Jy+bgVNWayYeTE=",
+        "lastModified": 1779773815,
+        "narHash": "sha256-Xk/VHHCUVcE+z8y+4O//kVHa94DCbXKeyqb/RMY4Z10=",
         "owner": "muratcankoylan",
         "repo": "Agent-Skills-for-Context-Engineering",
-        "rev": "61f38ffc0ff3ae83adcf2fe011f3b751105add6d",
+        "rev": "25e1fa79a33f0985793bcab3c64dde8d020c5132",
         "type": "github"
       },
       "original": {
@@ -131,11 +131,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1779704624,
-        "narHash": "sha256-INy8z/zDl0EQSaxIV+S4Xkq99NCWaqBKtxHmJoOdfyE=",
+        "lastModified": 1779868340,
+        "narHash": "sha256-TK1oFHU2SPXuB1gUX3SnqNujViWiYIPYTuWxXy1wR6U=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "b4d59ea23a029466b3e8314835ac7714296f2595",
+        "rev": "93c592a1bf2bfcb7e72b9a5344611efcf72917db",
         "type": "github"
       },
       "original": {
@@ -215,11 +215,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1779744236,
-        "narHash": "sha256-xqPNrSTMP/+LyKt/J8pU9JPtT6avjfEM1VKQ+f/0jGY=",
+        "lastModified": 1779879427,
+        "narHash": "sha256-hlmALuTfvvmT30+drozkbls8/WYW7kHwuwWP/3EKyxs=",
         "owner": "YPares",
         "repo": "rigup.nix",
-        "rev": "34a2184dcb8899e90a94f0a4115a5f2783552b5a",
+        "rev": "b81774d09aaa6a462a1a60952b99dfb024344b77",
         "type": "github"
       },
       "original": {
