@@ -1,7 +1,16 @@
 self:
-{ pkgs, ... }:
+{ pkgs, lib, riglib, config, ... }:
 {
   imports = with self.riglets; [read-bin-docs searxng-search];
+
+  options.research-assistant = {
+    interactive = lib.mkEnableOption "Tell the agent to conduct the search in collaboration with the user rather than autonomously";
+    rigletReminders = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      description = "Integrate a reminder to use specific riglets during the search";
+      default = ["read-bin-docs" "searxng-search"];
+    };
+  };
   
   config.riglets.research-assistant = {
     meta = {
@@ -22,6 +31,11 @@ self:
       version = "0.1.0";
     };
 
-    docs = ../research-assistant;
+    docs = riglib.writeFileTree {
+      "SKILL.md" = riglib.renderMinijinja {
+        template = ../research-assistant/SKILL.md;
+        data = config.research-assistant;
+      };
+    };
   };
 }
