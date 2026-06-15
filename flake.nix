@@ -7,8 +7,8 @@
   };
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     rigup.url = "github:YPares/rigup.nix";
+    nixpkgs.follows = "rigup/nixpkgs";
     agent-skills-context-eng = {
       url = "github:muratcankoylan/Agent-Skills-for-Context-Engineering";
       flake = false;
