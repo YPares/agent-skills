@@ -27,7 +27,7 @@ Nix-packaged in [nix-ai-tools](https://github.com/numtide/nix-ai-tools).
 
 ### Using `rigup.nix`
 
-This repository also exposes the Skills via Nix, as **riglet** modules for the `rigup` Agent Rig System (EXPERIMENTAL).
+This repository also exposes the Skills via Nix, as **riglet** modules for the `rigup` Agent Rig System.
 See [`rigup.nix`](https://github.com/YPares/rigup.nix) for more information.
 
 ## Tips about using them
