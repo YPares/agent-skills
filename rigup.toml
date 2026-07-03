@@ -13,7 +13,8 @@ self = [
   "searxng-search",
   "textual-builder",
   "typst-writer",
-  "research-assistant"
+  "research-assistant",
+  "herdr"
 ]
 [rigs.general-skills.config]
 research-assistant.interactive = true
