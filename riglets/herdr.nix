@@ -1,5 +1,5 @@
 self: { riglib, system, ... }: {
-  riglets.herdr = {
+  config.riglets.herdr = {
     tools = [ self.inputs.llm-agents.packages.${system}.herdr ];
     meta = {
       intent = "cookbook";
