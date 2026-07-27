@@ -100,11 +100,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1784942815,
-        "narHash": "sha256-sSzijwp8RjM048EaWgRH1dP6oLLPz7jd3rNKaMbzVdk=",
+        "lastModified": 1785158234,
+        "narHash": "sha256-fReWyOhGiVa8QEwvgkPNJPJnCmiHgNQf0ajM3sm9zzc=",
         "owner": "ogulcancelik",
         "repo": "herdr",
-        "rev": "d4e0dd3d903c50d2edb8c3cec71952a83989b310",
+        "rev": "a979916568b0225123711b1aa401d67102e3cf95",
         "type": "github"
       },
       "original": {
@@ -122,11 +122,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1784947678,
-        "narHash": "sha256-SVoM4NuyW+LUgRWMKAZEKOHMv/pN5gDYi1QmaHosu8Q=",
+        "lastModified": 1785121777,
+        "narHash": "sha256-5araxl7iFLgrVku59qaFgqRPyvUtG3CggRT1U1Sa410=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "d0ca84d2d5dcb17fda5c779821e4fa301b1f8386",
+        "rev": "e711100ae4b583e6a3d20243c639f8e86bd75a89",
         "type": "github"
       },
       "original": {
@@ -169,11 +169,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1784555310,
-        "narHash": "sha256-/FCliTPgiuV1owejZFNx3Ch9irdvkOfOFl+HHZ+DrtM=",
+        "lastModified": 1784872115,
+        "narHash": "sha256-THPEF2po0fsoH8gNtp+Ae0XFDJH3N/ol7xO3v6VMTJU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "421eebfd0ec7bccd4abe826ce62d7e6e83129493",
+        "rev": "335f0738cb2fa9708f3f428e39d2eae975d1338d",
         "type": "github"
       },
       "original": {
@@ -185,11 +185,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1784783405,
-        "narHash": "sha256-4IHyyLgLBdKefkljdKod4IMn023pQiDXAWJA187cmdY=",
+        "lastModified": 1785082112,
+        "narHash": "sha256-Y7z/nrPajIJyVDd9z53ZPZGm0HU+kej16Pwt2cNYI0A=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "7525d999cd850b9a488817abc89c75dc733acf17",
+        "rev": "e318e6adc497b5e8a5ac433c6c6ed21ecdab9029",
         "type": "github"
       },
       "original": {
@@ -206,11 +206,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1784947765,
-        "narHash": "sha256-wo353iVyFFfAudiEMOzGUiDshpHZkfNmRm50XQRlftc=",
+        "lastModified": 1785122615,
+        "narHash": "sha256-0lkb/UC2AOHIbJapoPbgPrXnC4KBjGbmxOXOs7CPEmw=",
         "owner": "YPares",
         "repo": "rigup.nix",
-        "rev": "304735d3467e5cb506953d0f9a19ff75b652d341",
+        "rev": "e50a821fb68f58dc037025e03cf7e51a2ec24df2",
         "type": "github"
       },
       "original": {
