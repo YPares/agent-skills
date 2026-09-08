@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 This file provides guidance to AI agents when working with code in this repository.
 
@@ -10,27 +10,6 @@ This repository is a curated collection of AI agent skills organized as a Claude
 - **Templates/boilerplate** (assets/ directory)
 
 Refer to the [README.md](./README.md) for installation instructions and usage tips.
-
-## Development Commands
-
-### Running Claude Code with Agent Configuration
-
-```bash
-# Use the justfile recipe (recommended)
-just claude [args]
-```
-
-**Why this matters:**
-It sets the following env vars:
-- `JJ_CONFIG`: Prevents Claude from trying to invoke interactive editors (see `.agent-space/jj-config.toml`)
-- `AGENT_PROFILE`: Isolated Nix profile for agent-specific tool installations
-- `PATH`: Ensures agent uses its own tool versions
-
-### Listing Available Commands
-
-```bash
-just --list
-```
 
 ## Repository Structure
 

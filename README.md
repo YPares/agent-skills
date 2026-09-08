@@ -29,25 +29,3 @@ Nix-packaged in [nix-ai-tools](https://github.com/numtide/nix-ai-tools).
 
 This repository also exposes the Skills via Nix, as **riglet** modules for the `rigup` Agent Rig System.
 See [`rigup.nix`](https://github.com/YPares/rigup.nix) for more information.
-
-## Tips about using them
-
-### working-with-jj
-
-Did you know your agent can have its own jj config? This can be useful to ensure:
-
-- It sees regular git diffs (instead of the more compact jj `color-words` default diff formatter which it isn't used to)
-- It uses the default and more usual `builtin_log_compact` template instead of your custom log template
-- It does not try to use your `$EDITOR`
-
-See [`this file`](.agent-space/jj-config.toml) as an example. You can just start the harness (e.g. claude-code) with:
-
-```sh
-JJ_CONFIG=/abs/path/to/agent/jj-config.toml claude ...
-```
-
-(The `just claude` recipe in the [`justfile`](./justfile) does that)
-
-### nix-profile-manager
-
-Also see the `just claude` recipe in the [`justfile`](./justfile).
