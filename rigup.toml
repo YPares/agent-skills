@@ -35,3 +35,8 @@ riglets.self = ["cursor-agent-supervisor", "github-pr-workflow"]
 # cursor-agent doesn't have a way to start a sub-agent, but it can be taught to "emulate" this
 # by calling itself recursively
 riglets.rigup = ["cursor"]
+
+# Rig used to work on this repo
+[rigs.default.riglets]
+rigup = ["opencode", "riglet-creator", "nix-module-system"]
+self = ["working-with-jj", "context-engineering-fundamentals", "read-bin-docs"]
