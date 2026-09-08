@@ -61,12 +61,6 @@ This repository itself uses JJ (Jujutsu) version control colocated with Git. Cha
 - Template updates
 - Skill reorganizations
 
-### 4. Agent-Friendly Configuration
-
-The `.agent-space/` directory contains:
-- **jj-config.toml**: Agent-specific JJ configuration that prevents editor invocations
-- **profile/**: Local Nix profile for isolated tool installations (see `nix-profile-manager` skill)
-
 ## Working with Skills
 
 ### Creating or Updating Skills
