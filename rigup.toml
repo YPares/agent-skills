@@ -14,7 +14,8 @@ self = [
   "textual-builder",
   "typst-writer",
   "research-assistant",
-  "herdr"
+  "herdr",
+  "agent-browser"
 ]
 [rigs.general-skills.config]
 research-assistant.interactive = true
