@@ -1,11 +1,6 @@
 {
   description = "YPares agent-skills in riglets form";
 
-  nixConfig = {
-    extra-substituters = [ "https://cache.garnix.io" ];
-    extra-trusted-public-keys = [ "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=" ];
-  };
-
   inputs = {
     rigup.url = "github:YPares/rigup.nix";
     nixpkgs.follows = "rigup/nixpkgs";
