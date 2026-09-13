@@ -101,11 +101,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1789041257,
-        "narHash": "sha256-/WBGJDH8pEkFU70qhnUCyOThm7LojQqnctLtR66Ipng=",
+        "lastModified": 1789322199,
+        "narHash": "sha256-nrBQhPpv8PcxjtAf5xaxqIE6oi3YcXGK3lt5lT58jSM=",
         "owner": "ogulcancelik",
         "repo": "herdr",
-        "rev": "241a1e0fad651f441d97b8373f14ef193b3d9faf",
+        "rev": "0305fdb6f71a660cb5632d6fef56d8a9655fb1e1",
         "type": "github"
       },
       "original": {
@@ -123,11 +123,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1789031966,
-        "narHash": "sha256-9iJmspIpxKjkAIgDA8MI23Us2C7BRAc2PWcHedd3NcI=",
+        "lastModified": 1789270650,
+        "narHash": "sha256-WwKQqG6V5PpOTipXJcz9IPphn1zR6zTrBd5guMZjQQg=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "f9d6a07194a3d5bfe2743e9b8460207fe87da15c",
+        "rev": "ffc77cdf743bea92fd6de78ba408a8b5d45492bd",
         "type": "github"
       },
       "original": {
@@ -186,11 +186,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1789006805,
-        "narHash": "sha256-q+GdZ3yq4Y2LXHRK0vKTM32Hwy7RCgUgy+hjwZLI5pY=",
-        "rev": "8ce4ef6cb6f871616146b9fe26d2a5ae594e94fe",
+        "lastModified": 1789149629,
+        "narHash": "sha256-eQUZVehWLDBbpBR2rq6DnuRee1ULT6Y675RhsYDSjYI=",
+        "rev": "eaad089433ca2bb662274377d33df3d0e51ef28b",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1070770.8ce4ef6cb6f8/nixexprs.tar.zst"
+        "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1072397.eaad089433ca/nixexprs.tar.zst"
       },
       "original": {
         "type": "tarball",
@@ -204,11 +204,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1789044346,
-        "narHash": "sha256-FIkncVYbhLcdzSH3qavl/iTIt0Grm+/+dJVnt2IRtoQ=",
+        "lastModified": 1789271383,
+        "narHash": "sha256-FGXln9GRZaUr2XS3ZImQ4ogdmpxTcmpk2e03X+cXcHk=",
         "owner": "YPares",
         "repo": "rigup.nix",
-        "rev": "97d9f6c7f184eafbabe6700506a7c833c63aa4c6",
+        "rev": "798b9c612aff1a44e8ad2be7130a7baa7fc0d5ad",
         "type": "github"
       },
       "original": {
