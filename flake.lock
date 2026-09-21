@@ -101,11 +101,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1789391040,
-        "narHash": "sha256-Ss2Xb+oz/U7nY3/RxBvuCXDIhqmpnq8AbHiWAC9qF+k=",
+        "lastModified": 1790012834,
+        "narHash": "sha256-wfu1t+oM56JwrSV7D9hSevijstx7O9UtUSwD3rWVm/k=",
         "owner": "ogulcancelik",
         "repo": "herdr",
-        "rev": "970b92682c1f1b0db0af46064ff0c9b8afcdc45b",
+        "rev": "28360107c1bfab57fb0de99d74bfa48e74423ca8",
         "type": "github"
       },
       "original": {
@@ -123,11 +123,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1789357600,
-        "narHash": "sha256-cMBFxKDaM2MDDvPJeABerT77i15WcZjNiAiVFNifIo8=",
+        "lastModified": 1789962792,
+        "narHash": "sha256-My7NEOd3xlI+RzefCId0KhBWfKT3cfY4DGBntnYSDdc=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "71c8a0257bc8848879bcca6fe951ff65b81f1d8d",
+        "rev": "e1cf3f0b95de3a6d58ec34790aa34f1950d54145",
         "type": "github"
       },
       "original": {
@@ -170,11 +170,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1789073787,
-        "narHash": "sha256-xfX/toC2QV707s06GbP4II/TxYF0fNQj7s5/LClNDKc=",
+        "lastModified": 1789754019,
+        "narHash": "sha256-N8gMcziRWB1CnSykjQPuf8lQKDD69LjnURRzaNXoPb4=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "aff8a0b28396750446e5537a96461bc4facdb287",
+        "rev": "2e032a04454b525daa6c6651264aaa5d3e98cf54",
         "type": "github"
       },
       "original": {
@@ -186,11 +186,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1789149629,
-        "narHash": "sha256-eQUZVehWLDBbpBR2rq6DnuRee1ULT6Y675RhsYDSjYI=",
-        "rev": "eaad089433ca2bb662274377d33df3d0e51ef28b",
+        "lastModified": 1789785513,
+        "narHash": "sha256-BMbikTjbh5H7ac/OjwGoJrlooh4dgNqhs51ABM83M7g=",
+        "rev": "20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1072397.eaad089433ca/nixexprs.tar.zst"
+        "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1076192.20b1ddd1aa5a/nixexprs.tar.zst"
       },
       "original": {
         "type": "tarball",
@@ -204,11 +204,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1789394041,
-        "narHash": "sha256-eJqWAiiu4MGRSBEJkDxTq6iynKZRspQxKeaxop9DxW8=",
+        "lastModified": 1789963019,
+        "narHash": "sha256-spCiP1tipDlj0BiLubJyksPjX2EVZph8sCcJQ1wd8Mk=",
         "owner": "YPares",
         "repo": "rigup.nix",
-        "rev": "fe1c5a9752c6d7d3c6a00c16a09af4afacbe1127",
+        "rev": "d7d2df44994caac6c27ce875a00452d178ba3ea5",
         "type": "github"
       },
       "original": {
