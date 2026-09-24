@@ -53,14 +53,6 @@ gh search code --repo "Jollywatt/typst-fletcher"
 gh search code --repo "Jollywatt/typst-fletcher" --extension "md" arrow node ...
 ```
 
-#### Via SearXNG
-
-**Requires `searxng-search` Skill**
-
-```bash
-curl "http://localhost:<searxng-port>/search?q=typst+diagram&format=json&categories=repos" | jq '.results[] | select(.engines[] == "github")'
-```
-
 ### When to Consult Documentation
 
 - Uncertain about function signatures or parameters
@@ -120,6 +112,44 @@ curl "http://localhost:<searxng-port>/search?q=typst+diagram&format=json&categor
   - #text(fill: faction.color, faction.name)
 ]
 ```
+
+## Coding Guidelines
+
+### Avoid mixing content and layout
+
+`#set`, `#show` and custom functions should be used to avoid mixing content with layout directives, and more importantly to ensure a visual consistency throughout the document.
+
+### Prefer conciseness and rely on defaults
+
+Typst functions often have sane default values for layout parameters. When unsure which value a parameter should have, just leave it unspecified.
+
+Likewise, a lot of function parameters admit different types depending on how much control the user wants to have over the layout. For instance:
+
+```
+#table(
+  columns: 3,
+  ...
+)
+```
+
+and
+
+```
+#table(
+  columns: (auto, auto, auto),
+  ...
+)
+```
+
+do the exact same thing. Prefer the first one if you don't want to have finer control over the size of one of the columns.
+
+### Use markup shortcuts when available
+
+Use _to-emphasize_ instead of `#emph[to-emphasize]`.
+
+### Prefer unicode litterals over expressions
+
+For instance just write `π` instead of `$pi$` or `#sym.pi`, and just write `🧮` instead of `#emoji.abacus`.
 
 ## Reading contents from a Typst file
 
