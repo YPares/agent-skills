@@ -1,0 +1,30 @@
+name: nightly-updates
+
+on:
+  schedule:
+    - cron: "30 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  flake-update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Update flake inputs
+        run: |
+          git config user.name "Nightly updater"
+          git config user.email "foo@bar.baz"
+          nix flake update --accept-flake-config
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "Update flake inputs"
+            nix flake check
+            git push origin HEAD:main
+          else
+            echo "No changes"
+          fi
+
