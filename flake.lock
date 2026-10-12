@@ -3,11 +3,11 @@
     "agent-skills-context-eng": {
       "flake": false,
       "locked": {
-        "lastModified": 1790834313,
-        "narHash": "sha256-2a0secj1Iei3j0DGMPd27+bwYSJW92vyYU6Jz13/Hso=",
+        "lastModified": 1791770799,
+        "narHash": "sha256-BDRppGD8yTdaKq/VFEOCBg2Y2NrnfmCPm0o/9jcMomE=",
         "owner": "muratcankoylan",
         "repo": "Agent-Skills-for-Context-Engineering",
-        "rev": "58b55a8921758d13453b440704fb1b5b208c0b0e",
+        "rev": "9ff0c99108b36d3b886defd825d8ac1f47dba374",
         "type": "github"
       },
       "original": {
@@ -101,11 +101,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1791490364,
-        "narHash": "sha256-CCHbrAwI51iNPu7/ubU/UUmyxeIWEYoIcoFC5A6+KX8=",
+        "lastModified": 1791759048,
+        "narHash": "sha256-/KMQbdh5X6Sa1GTUqyKf3vHdHDgpuRfJr9iHommwiH8=",
         "owner": "ogulcancelik",
         "repo": "herdr",
-        "rev": "2563803dca97c040beaf3dc3acdcb5a3221b4238",
+        "rev": "dc6b6e5f42831ea7114f34dcf12900680eb36ae0",
         "type": "github"
       },
       "original": {
@@ -123,11 +123,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1791693635,
-        "narHash": "sha256-ipNqB8YA2KWcWPcLnCcxzAhiYEqbVRunwMlDycAmllo=",
+        "lastModified": 1791780466,
+        "narHash": "sha256-4Vl1A30Abj+l00fp8s9y76dKoinyfVj514Xz2c+Sl3E=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "07ce36a485c780625edc064bfc5fa6b7d8cb4a8f",
+        "rev": "1dddb70a36b338d2e280c29d9181c6f9b04e76c4",
         "type": "github"
       },
       "original": {
@@ -204,11 +204,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1791693734,
-        "narHash": "sha256-+RZ46BCSDunGRauHR2Y7oRSGqAk4Ib798JxYrLZaCvw=",
+        "lastModified": 1791781055,
+        "narHash": "sha256-Fwnk7dAERpZJrK+kNj2Qa8KX1iE3heIaL1kHoaHJr6g=",
         "owner": "YPares",
         "repo": "rigup.nix",
-        "rev": "6092fec3e5d9d56ec43bdc42b193bf396d687c34",
+        "rev": "57264530a65003780289031f875e777551b365fd",
         "type": "github"
       },
       "original": {
