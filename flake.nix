@@ -14,7 +14,6 @@
       url = "github:muratcankoylan/Agent-Skills-for-Context-Engineering";
       flake = false;
     };
-    herdr.url = "github:ogulcancelik/herdr";
   };
 
   outputs =

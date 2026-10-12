@@ -1,6 +1,6 @@
-self: { riglib, system, ... }: {
+self: { pkgs, riglib, ... }: {
   config.riglets.herdr = {
-    tools = [ self.inputs.llm-agents.packages.${system}.herdr ];
+    tools = [ pkgs.herdr ];
     meta = {
       intent = "cookbook";
       description = "How to use the herdr terminal multiplexer";
@@ -13,7 +13,7 @@ self: { riglib, system, ... }: {
       status = "stable";
     };
     docs = riglib.writeFileTree {
-      "SKILL.md" = self.inputs.herdr + /SKILL.md;
+      "SKILL.md" = "${pkgs.herdr}/share/skills/herdr/herdr/SKILL.md";
     };
   };
 }
