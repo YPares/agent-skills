@@ -104,11 +104,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1793335781,
-        "narHash": "sha256-ZVTHoghW4rQ4R3TFDbXdiGVTC/Fxfwn/EqZr9lTQ8Wg=",
+        "lastModified": 1793421291,
+        "narHash": "sha256-dAxTsgOTmVRPhI8WoM3GwPM3WCAPBsEEUp9iyqbuGdQ=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "2cfc2e6af9ffab8821f07e9f2022ef8f95f80dcc",
+        "rev": "acb4dc6e4aed9da686428e9e09a93979f5a76387",
         "type": "github"
       },
       "original": {
@@ -135,11 +135,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1793225069,
-        "narHash": "sha256-sx1f99WGrDfJ83KKuQrqGPmot0rnDgmpLJDzpU2oHQQ=",
+        "lastModified": 1793345420,
+        "narHash": "sha256-e/yiZ31gXRROBDcnOtT3YwDQ73NVG9Cepccbt86LIn8=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "e62746b0b472753ef019baceab6f1e2e52014980",
+        "rev": "885ba4d038f10c3d17d7a92e8c3cc185b99c9158",
         "type": "github"
       },
       "original": {
@@ -151,11 +151,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1793225069,
-        "narHash": "sha256-GYpArmwi/iMuX2ov31oCBhAXRMJdNX9kOl2LZHCuR6M=",
-        "rev": "e62746b0b472753ef019baceab6f1e2e52014980",
+        "lastModified": 1793345420,
+        "narHash": "sha256-RcsCCbI6YtyC9Be5c0XiwLMHJivUaGWSNHjJt0Q3NBE=",
+        "rev": "885ba4d038f10c3d17d7a92e8c3cc185b99c9158",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1104102.e62746b0b472/nixexprs.tar.zst"
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1105041.885ba4d038f1/nixexprs.tar.zst"
       },
       "original": {
         "type": "tarball",
@@ -169,11 +169,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1793335961,
-        "narHash": "sha256-WnXjPlhwKpPijmWvMJwpXinmCXibDS36/iBnoHn7xeE=",
+        "lastModified": 1793421498,
+        "narHash": "sha256-nWvTaOK558Oql35hY6oCVxCYlIdnneugkrO8Z7AFGTY=",
         "owner": "YPares",
         "repo": "rigup.nix",
-        "rev": "b8295dfed43f36af57fcb82208a96d61911a4db3",
+        "rev": "cd4b71a3d4e167017d8cdb724555cd0547733f75",
         "type": "github"
       },
       "original": {
