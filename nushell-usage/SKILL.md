@@ -249,6 +249,24 @@ for item in $list {
 }
 ```
 
+For stateful streams such as paginated API responses, use `generate` instead of
+accumulating a mutable list in a loop. Return `out` for the current value and
+`next` for the next state; omit `next` on the final page. Pipe the generator
+directly into downstream commands: binding its output with `let` collects the
+stream and fetches every page immediately. Downstream operations such as
+sorting or grouping may still need to consume the entire stream.
+
+```nu
+generate {|page_token = null|
+    let page = fetch-page $page_token
+    if ($page.nextPageToken? | is-empty) {
+        {out: ($page.items? | default [])}
+    } else {
+        {out: ($page.items? | default []), next: $page.nextPageToken}
+    }
+} | flatten | each {|item| $item.name}
+```
+
 ### String Manipulation
 
 ```nu
