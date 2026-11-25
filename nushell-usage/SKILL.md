@@ -125,8 +125,14 @@ $table | insert retired {|row| $row.age > 65}
 # Rename column
 $table | rename -c {age: years}
 
-# Group by age; --to-table preserves integer keys in 0.117+
-$table | group-by age --to-table
+# Group directly into a table instead of grouping then transposing.
+# In 0.117+, --to-table also preserves non-string keys
+$table | group-by age --to-table --prune  # --prune also removes the now redundant 'age' field from the items of each group
+
+# Aggregate a column in each group's items
+$table | group-by age --to-table --prune | each {|group|
+    {age: $group.age, count: ($group.items | length)}
+}
 
 # Transpose (rows ↔ columns)
 $table | transpose name data
