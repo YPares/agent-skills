@@ -18,6 +18,10 @@ and may lag behind upstream.
 
 **CRITICAL**: Pipeline input (`$in`) is NOT interchangeable with function parameters!
 
+When a command transforms a primary input, prefer receiving that input through
+the pipeline and declaring input/output types. Keep configuration in parameters:
+this makes the command easier to compose with other pipelines.
+
 ```nu
 # Positional arguments only: append-to [1 2 3] 4
 def append-to [list: list, value: any]: nothing -> list {
@@ -182,11 +186,14 @@ def my-func [] {
 }
 
 # Capture stdout, stderr, and exit status for an external command
-let result = (^git --version | complete)
+let result = ^git --version | complete
 if $result.exit_code != 0 {
     print $"Error: ($result.stderr)"
 }
 ```
+
+When the entire expression bound by `let` fits on one line, omit unnecessary
+parentheses around its pipeline.
 
 ### Closures and Scoping
 
