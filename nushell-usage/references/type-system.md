@@ -2,40 +2,28 @@
 
 ## Table of Contents
 
-- [Type Hierarchy](#type-hierarchy) - Overview of all types
+- [Common Types and Annotations](#common-types-and-annotations) - Common values and signature types
 - [Type Annotations](#type-annotations) - Function signatures, complex types
 - [Built-in Scalar Types](#built-in-scalar-types) - Numbers, strings, dates, durations, filesizes, binary, glob
 - [Collection Types](#collection-types) - Lists, records, tables, ranges
 - [Type Conversions](#type-conversions) - Explicit conversions, type checking
-- [Closures and Blocks](#closures-and-blocks) - Closure types, blocks vs closures
+- [Closure Type](#closure-type) - Closure values and parameters
 - [Type Narrowing and Guards](#type-narrowing-and-guards) - Optional types, type guards
-- [Generic Types](#generic-types) - Preserving types through functions
+- [Generic Containers](#generic-containers) - Concrete element types versus `any`
 - [Type Coercion](#type-coercion) - Automatic coercion, avoiding issues
 - [Advanced Type Patterns](#advanced-type-patterns) - Discriminated unions, option types
 
-## Type Hierarchy
+## Common Types and Annotations
 
-```
-any
-├── nothing (null/void)
-├── bool
-├── int
-├── float
-├── number (int | float)
-├── string
-├── date
-├── duration
-├── filesize
-├── binary
-├── range
-├── glob
-├── list<T>
-├── record<K, V>
-├── table<T> (list<record<T>>)
-├── closure
-├── block
-└── error
-```
+| Kind | Examples |
+| --- | --- |
+| Scalar values | `nothing` (`null`), `bool`, `int`, `float`, `string`, `datetime`, `duration`, `filesize`, `binary`, `glob`, `range`, `cell-path` |
+| Collections | `list<int>`, `record<name: string, age: int>`, `table<name: string, age: int>` |
+| Callables | `closure` |
+| Broad annotations | `any`, `number` (int or float), `oneof<int, string>` |
+
+For the current type annotations and parser shapes, see the
+[Nushell Book](https://www.nushell.sh/book/custom_commands.html#parameter-types).
 
 ## Type Annotations
 
@@ -43,48 +31,66 @@ any
 
 ```nu
 # No types (accepts any)
-def func [x] { ... }
+def identity-arg [x] { $x }
 
 # Typed parameters
-def func [x: int, y: string] { ... }
+def format-pair [x: int, y: string] { $"($x): ($y)" }
 
 # Pipeline types
-def func []: string -> int { ... }
+def text-length []: string -> int { str length }
 
 # Both pipeline and parameters
-def func [multiplier: int]: list<int> -> list<int> {
-    $in | each {|x| $x * $multiplier}
+def scale [multiplier: int]: list<int> -> list<int> {
+    each {|x| $x * $multiplier}
 }
 
 # Optional parameters with defaults
-def func [
+def show-options [
     x: int
     y: int = 10           # Default value
     --flag                # Named flag (no type --> BOOLEAN)
     --option: string      # Named param (null if not passed)
     --foo: string = "bar" # Named param with default value
-] { ... }
+] { [$x $y $flag $option $foo] }
 ```
 
 ### Complex Types
 
 ```nu
 # Lists
-def func [items: list<string>] { ... }
-def func [matrix: list<list<int>>] { ... }
+def count-names [items: list<string>] { $items | length }
+def count-rows [matrix: list<list<int>>] { $matrix | length }
 
 # Records
-def func [config: record<host: string, port: int>] { ... }
+def get-host [config: record<host: string, port: int>] { $config.host }
 
 # Tables (list of records)
-def func [data: table] { ... }
+def get-names [data: table<name: string, age: int>] { $data.name }
 
 # Union types (oneof)
-def func [value: oneof<int, string>] { ... }
+def display-value [value: oneof<int, string>] { $"($value)" }
 
-# Closures input/output type cannot be indicated for now
-def func [transform: closure] { ... }
+# A closure parameter accepts a callable without declaring its return type
+def run-transform [transform: closure] { do $transform }
 ```
+
+### Reusable Type Aliases (0.117+)
+
+```nu
+module geometry {
+    export type Point = record<x: float, y: float>
+}
+
+use geometry Point
+type Polygon = list<Point>
+def first-x [poly: Polygon]: nothing -> float { $poly.0.x }
+first-x [{x: 1.0, y: 2.0}]  # 1.0
+```
+
+Define aliases before use. Import exported aliases explicitly (`use geometry
+Point` or `use geometry *`); bare `use geometry` does not import them. An alias
+does not create a distinct type or take type parameters. `type` is now reserved:
+rename commands called `type`, or use `^type` for an external executable.
 
 ## Built-in Scalar Types
 
@@ -127,7 +133,7 @@ Line 1
 Line 2
 "
 
-# Raw strings (no escaping, but no interpolation). Number of hashes at beging/end must match
+# Raw strings do not escape or interpolate; the opening and closing hash counts must match
 r###'C:\Users\name'###
 ```
 
@@ -154,7 +160,7 @@ date now              # Current datetime
 ```nu
 # File sizes
 1kb, 500mb, 2gb, 1tb
-1024 | into filesize  # 1kb
+1024 | into filesize  # 1024 bytes (1 KiB)
 
 # Filesize math
 100mb + 50mb          # 150mb
@@ -178,13 +184,12 @@ let data = (open --raw file.bin | into binary)
 ### Glob Patterns
 
 ```nu
-# Glob type
-glob "*.rs"
-"*.txt" | into glob
+# Store a pattern without expanding it
+let pattern = ("**/*.md" | into glob)
+$pattern | describe  # glob
 
-# Stored in variables
-let pattern = glob "**/*.md"
-$pattern
+# Expand it to matched paths
+glob $pattern
 ```
 
 ## Collection Types
@@ -262,15 +267,15 @@ let consistent_table = [
 # Exclusive end
 1..<5                 # [1, 2, 3, 4]
 
-# Step ranges
-1..2..10              # [1, 3, 5, 7, 9]
+# The middle number is the second value, not the step
+1..3..10              # [1, 3, 5, 7, 9]
 0..5..20              # [0, 5, 10, 15, 20]
 
 # Reverse ranges
 5..1                  # [5, 4, 3, 2, 1]
 
-# Character ranges (dates, etc.)
-'a'..'e'              # ['a', 'b', 'c', 'd', 'e']
+# Use seq char for character sequences
+seq char a e          # [a, b, c, d, e]
 ```
 
 ## Type Conversions
@@ -280,7 +285,8 @@ let consistent_table = [
 ```nu
 # To string
 42 | into string                # "42"
-[1, 2, 3] | into string         # "[1, 2, 3]"
+[1, 2, 3] | into string         # ["1", "2", "3"]
+[1, 2, 3] | to nuon             # "[1, 2, 3]"
 
 # To int
 "42" | into int                 # 42
@@ -304,7 +310,7 @@ let consistent_table = [
 1705334400 | into datetime      # From unix timestamp
 
 # To filesize
-1024 | into filesize            # 1kb
+1024 | into filesize            # 1024 bytes (1 KiB)
 "500MB" | into filesize         # 500mb
 
 # To duration
@@ -336,7 +342,7 @@ def is-list [] {
 
 ```nu
 # Simple closure
-let double = {|x| $x * 2}
+let double = {|x: int| $x * 2}
 
 # Closure type annotation
 def apply [
@@ -380,8 +386,8 @@ def func [
 def safe-process [value: any] {
     match ($value | describe) {
         "int" => ($value * 2)
-        "string" => ($value | str upcase)
-        "list" => ($value | length)
+        "string" => ($value | str uppercase)
+        $kind if ($kind starts-with "list<") => ($value | length)
         _ => null
     }
 }
@@ -398,24 +404,26 @@ def process [x: any] {
 }
 ```
 
-## Generic Types
+## Generic Containers
 
-### Preserving Types Through Functions
+`list<any>` accepts lists with different element types. The signature does not
+promise a specific output element type or tie it to the input type.
 
 ```nu
-# Generic list function
+# Map over any list; output element types depend on the closure
 def my-map [transform: closure]: list<any> -> list<any> {
     $in | each $transform
 }
 
-# Type preserved at call site
-[1, 2, 3] | my-map {|x| $x * 2}  # list<int>
-["a", "b"] | my-map {|x| $x | str upcase}  # list<string>
+[1, 2, 3] | my-map {|x| $x * 2}  # [2, 4, 6]
+["a", "b"] | my-map {|x| $x | str uppercase}  # ["A", "B"]
 ```
 
 ## Type Coercion
 
-Auto-coercion done ONLY FOR STRING INTERPOLATIONS!
+Don't rely on automatic conversion between text and numbers. Interpolation
+formats values as text, and numeric operators can accept mixed numeric types
+(`1 + 2.5` produces `3.5`).
 
 ```nu
 # NO

@@ -1,10 +1,16 @@
 ---
 name: nushell-usage
 description: Essential patterns, idioms, and gotchas for writing Nushell code. Use when writing Nushell scripts, functions, or working with Nushell's type system, pipelines, and data structures. Complements plugin development knowledge with practical usage patterns.
-version_target: "0.100+"
+version: 0.2.0
+targets:
+  - nushell: ">=0.117.0"
 ---
 
 # Nushell Usage Patterns
+
+Examples target Nushell 0.117.0. Check `nu --version` before using
+0.117-specific syntax: the rig's `nu` normally comes from its Nixpkgs input
+and may lag behind upstream.
 
 ## Critical Distinctions
 
@@ -13,42 +19,41 @@ version_target: "0.100+"
 **CRITICAL**: Pipeline input (`$in`) is NOT interchangeable with function parameters!
 
 ```nu
-# ❌ WRONG - treats $in as first parameter
-def my-func [list: list, value: any] {
+# Positional arguments only: append-to [1 2 3] 4
+def append-to [list: list, value: any]: nothing -> list {
     $list | append $value
 }
 
-# ✅ CORRECT - declares pipeline signature
-def my-func [value: any]: list -> list {
-    $in | append $value
+# Pipeline input plus one positional argument
+def append-value [value: any]: list -> list {
+    append $value
 }
 
 # Usage
-[1 2 3] | my-func 4  # Works correctly
-my-func [1 2 3] 4    # ERROR! my-func doesn't take positional params
+[1 2 3] | append-value 4  # [1 2 3 4]
+# append-value [1 2 3] 4   # Error: extra positional argument
 ```
 
 **This applies to closures too.**
 
 **Why this matters**:
-- Pipeline input can be **lazily evaluated** (streaming)
-- Parameters are **eagerly evaluated** (loaded into memory)
-- Different calling conventions entirely
+- The first pipeline in a command body receives the input directly. Calling a stream-aware command there can preserve streaming; reading `$in` as a value or binding the input with `let` collects it.
+- Positional arguments are values, not streams. For closures, `do $fn $arg` binds a positional parameter; `$value | do $fn` supplies pipeline input instead.
 
 ### Type Signatures
 
 ```nu
 # No pipeline input
-def func [x: int] { ... }                    # (x) -> output
+def increment [x: int]: nothing -> int { $x + 1 }
 
 # Pipeline input only
-def func []: string -> int { ... }           # string | func -> int
+def text-length []: string -> int { str length }
 
 # Both pipeline and parameters
-def func [x: int]: string -> int { ... }     # string | func x -> int
+def text-length-plus [x: int]: string -> int { ($in | str length) + $x }
 
 # Generic pipeline
-def func []: any -> any { ... }              # works with any input type
+def passthrough []: any -> any {}
 ```
 
 ## Common Patterns
@@ -82,7 +87,7 @@ $rec | update name {|r| $"Dr. ($r.name)"}
 $rec | insert active true
 
 # Insert field based on existing fields
-{x:1, y: 2} | insert z {|r| $r.x + $r.y}
+{x: 1, y: 2} | insert z {|r| $r.x + $r.y}
 
 # Upsert (update or insert)
 $rec | upsert count {|r| ($r.count? | default 0) + 1}
@@ -92,6 +97,10 @@ $rec | reject password secret_key
 
 # Select fields
 $rec | select name age email
+
+# Filter fields or convert selected fields without transposing (0.117+)
+{a: 1, b: 2} | record where value > 1              # {b: 2}
+{age: "42"} | record apply {age: {into int}}       # {age: 42}
 ```
 
 ### Working with Tables
@@ -112,8 +121,8 @@ $table | insert retired {|row| $row.age > 65}
 # Rename column
 $table | rename -c {age: years}
 
-# Group by
-$table | group-by status --to-table
+# Group by age; --to-table preserves integer keys in 0.117+
+$table | group-by age --to-table
 
 # Transpose (rows ↔ columns)
 $table | transpose name data
@@ -144,8 +153,13 @@ let result = match $value {
 $record.field?                    # Returns null if missing
 $record.field? | default "N/A"    # Provide fallback
 
-# Check existence
-if ($record.field? != null) { ... }
+# Distinguish an absent field from a present null
+"field" in ($record | columns)
+
+# Optional and dynamic cell paths (spread in 0.117+)
+$record | get --optional field
+let paths = [name age]
+$record | get ...$paths           # Returns one value per path
 ```
 
 ### Error Handling
@@ -167,14 +181,8 @@ def my-func [] {
     }
 }
 
-# Check command success
-let result = try { fallible-command }
-if ($result == null) {
-    # Handle error
-}
-
-# Use complete for detailed error info for EXTERNAL commands (bins)
-let result = (fallible-external-command | complete)
+# Capture stdout, stderr, and exit status for an external command
+let result = (^git --version | complete)
 if $result.exit_code != 0 {
     print $"Error: ($result.stderr)"
 }
@@ -183,10 +191,10 @@ if $result.exit_code != 0 {
 ### Closures and Scoping
 
 ```nu
-# Closures capture environment
+# Closures capture immutable variables
 let multiplier = 10
 let double_and_add = {|x| ($x * 2) + $multiplier}
-5 | do $double_and_add  # Returns 20
+do $double_and_add 5   # Returns 20
 
 # Outer mutable variables CANNOT be captured in closures
 mut sum = 0
@@ -204,16 +212,16 @@ $list | each {|item| $item * 2}
 
 # each --flatten: stream outputs instead of collecting
 # Turns list<list<T>> into list<T> by streaming items as they arrive
-ls *.txt | each --flatten {|f| open $f.name | lines } | find "TODO"
+glob *.txt --no-dir | each --flatten {|file| open --raw $file | lines } | find --no-highlight "TODO"
 
 # each --keep-empty: preserve null results
 [1 2 3] | each --keep-empty {|e| if $e == 2 { "found" }}
-# Result: ["" "found" ""]  (vs. without flag: ["found"])
+# Result: [null "found" null]  (vs. without flag: ["found"])
 
-# filter/where: select elements
+# where: select elements (`filter` was removed in 0.117)
 # Row condition (field access auto-uses $it)
-$table | where size > 100        # Implicit: $it.size > 100
-$table | where type == "file"    # Implicit: $it.type == "file"
+ls | where size > 100b           # Implicit: $it.size > 100b
+ls | where type == "file"        # Implicit: $it.type == "file"
 
 # Closure (must use $in or parameter)
 $list | where {|x| $x > 10}
@@ -246,7 +254,7 @@ $"Sum: (1 + 2)"  # "Sum: 3"
 ["a", "b"] | str join ", "     # "a, b"
 
 # Regex
-"hello123" | parse --regex '(?P<word>\w+)(?P<num>\d+)'
+"hello123" | parse --regex '(?<word>[a-z]+)(?<num>[0-9]+)'
 
 # Multi-line strings
 $"
@@ -264,40 +272,40 @@ glob **/*.rs                      # Recursive .rs files
 glob **/*.{rs,toml}               # Multiple extensions
 ```
 
-**Note**: Prefer `glob` over `find` or `ls` for file searches - it's more efficient and has better pattern support.
+Use `glob` for path matches, `ls` when you need file metadata, and `find` to search values already in a pipeline. Nushell's `find` is not Unix `find` (`^find`).
 
 ### Module System
 
 ```nu
 # Define module
 module my_module {
-    export def public-func [] { ... }
-    def private-func [] { ... }
+    def private-greeting [] { "Hello" }
+    export def greet [name: string] { $"(private-greeting), ($name)!" }
 
     export const MY_CONST = 42
+    export type User = record<name: string, age: int>
 }
 
 # Use module
-use my_module *
-use my_module [public-func MY_CONST]
+# Import selected exports, or use `use my_module *` to import all
+use my_module [greet MY_CONST User]
 
 # Import from file
-use lib/helpers.nu *
+# use lib/helpers.nu *
 ```
 
 ## Row Conditions vs Closures
 
-Many commands accept either a **row condition** or a **closure**:
+`where` accepts either a **row condition** or a **closure**:
 
 ### Row Conditions (Short-hand Syntax)
 
 ```nu
 # Automatic $it expansion on left side
-$table | where size > 100           # Expands to: $it.size > 100
-$table | where name =~ "test"       # Expands to: $it.name =~ "test"
+ls | where size > 100b              # Expands to: $it.size > 100b
+ls | where name =~ "test"           # Expands to: $it.name =~ "test"
 
-# Works with: where, filter (DEPRECATED, use where), find, skip while, take while, etc.
-ls | where type == file             # Simple and readable
+ls | where modified older-than 2wk  # Duration-based comparison (0.117+)
 ```
 
 **Limitations**:
@@ -305,21 +313,21 @@ ls | where type == file             # Simple and readable
 - Only field access on left side auto-expands
 - Subexpressions need explicit `$it`:
   ```nu
-  ls | where ($it.name | str downcase) =~ readme  # Need $it here
+  ls | where ($it.name | str lowercase) =~ readme  # Need $it here
   ```
 
 ### Closures (Full Flexibility)
 
 ```nu
 # Use $in or parameter name
-$table | where {|row| $row.size > 100}
-$table | where {$in.size > 100}
+ls | where {|row| $row.size > 100b}
+ls | where {$in.size > 100b}
 
 # Can be stored and reused
 let big_files = {|row| $row.size > 1mb}
 ls | where $big_files
 
-# Works anywhere
+# Use closures with commands that accept them
 $list | each {|x| $x * 2}
 $list | where {$in > 10}
 ```
@@ -376,7 +384,7 @@ $list | default -e $val_if_empty
 For advanced patterns and deeper dives, see:
 
 - **[references/advanced-patterns.md](references/advanced-patterns.md)** - Performance optimization, lazy evaluation, streaming, closures, memory-efficient patterns
-- **[references/type-system.md](references/type-system.md)** - Complete type system guide, conversions, generics, type guards
+- **[references/type-system.md](references/type-system.md)** - Type annotations, aliases, conversions, and type guards
 
 ## Best Practices
 
@@ -390,7 +398,7 @@ For advanced patterns and deeper dives, see:
 8. **Use modules** - organize related functions
 9. **Test incrementally** - build complex pipelines step-by-step
 10. **Prefix external commands with caret** - `^grep` instead of just `grep`. Makes it clear it's not a nushell command, avoids ambiguity. **Nushell commands always have precedence**, e.g. `find` is NOT usual Unix `find` tool: use `^find`.
-11. **Use dedicated external commands when needed** - searching through lots of files is still faster with `grep` or `rg`, and large nested JSON structures will be processed much faster by `jq`
+11. **Use dedicated external commands when needed** - for example, `^rg` for recursive text search or `^jq` for filtering JSON without first converting it to Nushell values.
 
 ## Debugging Techniques
 
@@ -401,8 +409,8 @@ $data | each {|x| print $x; $x}  # Prints and passes through
 # Inspect type
 $value | describe
 
-# Debug point
-debug           # Drops into debugger (if available)
+# Inspect a value without replacing the pipeline data
+$data | inspect
 
 # Timing
 timeit { expensive-command }
@@ -412,5 +420,6 @@ timeit { expensive-command }
 
 - [Official Nushell Book](https://www.nushell.sh/book/)
 - [Nushell Cookbook](https://www.nushell.sh/cookbook/)
-- [Type Signatures Guide](https://www.nushell.sh/book/custom_commands.html#type-signatures)
+- [Pipeline Input-Output Signatures](https://www.nushell.sh/book/custom_commands.html#pipeline-input-output-signature)
 - [Module System](https://www.nushell.sh/book/modules.html)
+- [Nushell 0.117.0 release notes](https://www.nushell.sh/blog/2026-11-09-nushell_v0_117_0.html)

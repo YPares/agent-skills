@@ -6,6 +6,7 @@
 - [Advanced Closures](#advanced-closures) - Composition, currying, recursion
 - [Advanced Record/Table Manipulation](#advanced-recordtable-manipulation) - Dynamic fields, joins, grouping
 - [Working with Streams](#working-with-streams) - Custom streams, transformations
+- [Structured External Output](#structured-external-output) - Decode external output with `@structured`
 - [Advanced Error Handling](#advanced-error-handling) - Graceful degradation, error context
 - [Memory-Efficient Patterns](#memory-efficient-patterns) - Large file processing, batching
 - [Advanced Glob Patterns](#advanced-glob-patterns) - Complex patterns, depth limits
@@ -16,11 +17,11 @@
 ### Lazy vs Eager Evaluation
 
 ```nu
-# Lazy (streaming) - memory efficient for large data
-large_file.csv | open | where status == "active" | first 10
+# Stream rows and stop after the first 10 matches
+open --raw large_file.csv | from csv | where status == "active" | first 10
 
 # Eager (loads all) - faster for small datasets with multiple operations
-let data = (large_file.csv | open | where status == "active")
+let data = (open --raw large_file.csv | from csv | where status == "active")
 $data | first 10
 $data | last 10
 $data | length
@@ -32,9 +33,13 @@ $data | length
 - Memory constrained
 
 **When to use eager:**
-- Small datasets (< 10k rows)
+- Data that fits comfortably in memory
 - Multiple operations on same data
-- Random access needed (though Nushell not great with random access, because no dedicated array/vector type, only lists)
+- Random access needed
+
+To check whether rows are still streaming, pass the pipeline directly to
+`describe --no-collect`: it reports `stream` without reading the rows.
+Assigning to a variable first collects the stream.
 
 ### Parallel Processing
 
@@ -80,16 +85,16 @@ if $result > 10 {
 
 ```nu
 # Without --flatten: waits for each stream to complete
-ls *.txt | each {|f| open $f.name | lines }
+glob *.txt --no-dir | each {|file| open --raw $file | lines }
 # Returns: list<list<string>>
 
 # With --flatten: streams items as they arrive
-ls *.txt | each --flatten {|f| open $f.name | lines }
+glob *.txt --no-dir | each --flatten {|file| open --raw $file | lines }
 # Returns: list<string> (flattened)
 
 # Practical example: search across files without waiting
-ls **/*.nu | each --flatten {|f|
-    open $f.name | lines | find "export def"
+glob **/*.nu --no-dir | each --flatten {|file|
+    open --raw $file | lines | find --no-highlight "export def"
 } | str join "\n"
 ```
 
@@ -106,9 +111,10 @@ let add_ten = {|x| $x + 10}
 [1 2 3] | each {|x| do $add_ten (do $double $x)}
 # Result: [12, 14, 16]
 
-# Or with pipeline
-let transform = {|x| $x | do $double | do $add_ten}
-[1 2 3] | each $transform
+# Or compose closures that take pipeline input rather than arguments
+let double_input = {$in * 2}
+let add_ten_input = {$in + 10}
+[1 2 3] | each {$in | do $double_input | do $add_ten_input}
 ```
 
 ### Closure Currying Pattern
@@ -126,10 +132,10 @@ let quadruple = (make-multiplier 4)
 [1 2 3] | each $quadruple  # [4, 8, 12]
 ```
 
-### Recursive Closures
+### Recursive Custom Commands
 
 ```nu
-# Factorial using closure
+# Factorial using a recursive command
 def factorial [n: int] {
     if $n <= 1 {
         1
@@ -159,6 +165,10 @@ let fields = if $detailed {["id", "name", "email"]} else {["id", "name"]}
 $table | select ...$fields
 ```
 
+Use `get ...$fields` (0.117+) to retrieve a list of values in path order
+instead of preserving the record or table shape. Use `get --optional` for
+missing paths; the old `--ignore-errors` flag was removed in 0.117.
+
 ### Table Joins
 
 ```nu
@@ -170,9 +180,16 @@ $users | join --outer $orders user_id
 
 # Left join
 $users | join --left $orders user_id
+
+# Anti join (0.117+): users with no matching order
+$users | join --anti $orders user_id
 ```
 
 ### Group By Aggregations
+
+In 0.117, `group-by --to-table` preserves the original key type and groups by
+typed identity. Plain `group-by` still uses display strings as record keys, so
+`true` and `"true"` can share a group without `--to-table`.
 
 ```nu
 # Group and count
@@ -197,21 +214,20 @@ $sales | group-by category --to-table |
 ### Creating Custom Streams
 
 ```nu
-# Generate infinite sequence
+# Emit one value per step; next carries state into the next invocation
 def fibonacci [] {
-    mut a = 0
-    mut b = 1
-    loop {
-        $a
-        let temp = $b
-        $b = $a + $b
-        $a = $temp
-    }
+    generate {|state|
+        {out: $state.a, next: {a: $state.b, b: ($state.a + $state.b)}}
+    } {a: 0, b: 1}
 }
 
-# Use with first to limit
+# Bound the stream before collecting it
 fibonacci | first 10
+# [0 1 1 2 3 5 8 13 21 34]
 ```
+
+Omit `next` to end a `generate` stream. `loop` and `while` are control
+flow, not stream producers, and cannot be piped in 0.117.
 
 ### Stream Transformations
 
@@ -227,6 +243,24 @@ $stream | take while {|x| $x < 1000}
 # [[1,2,3], [2,3,4], [3,4,5]]
 ```
 
+## Structured External Output
+
+In 0.117+, `@structured` on an `extern` declaration adds machine-readable
+arguments and decodes the result when Nushell consumes the output (for example,
+in `let` or when piping into an internal command):
+
+```nu
+@structured [--porcelain] { lines | parse --regex '^(?<status>..) (?<file>.+)$' }
+extern "git status" []
+
+git status | where status =~ M | get file  # Structured output
+git status                                 # Normal Git display
+```
+
+Output sent directly to the terminal, to another external command, or redirected
+to a file stays in the external command's normal format. See the
+[release notes](https://www.nushell.sh/blog/2026-11-09-nushell_v0_117_0.html#structured-data-from-external-commands).
+
 ## Advanced Error Handling
 
 ### Graceful Degradation
@@ -238,7 +272,7 @@ def robust-fetch [url: string] {
         http get $url
     } catch {
         try {
-            curl -s $url | from json
+            ^curl --fail --silent --show-error $url | from json
         } catch {
             {error: "All fetch methods failed"}
         }
@@ -270,25 +304,27 @@ def safe-divide [a: float, b: float] {
 ### Processing Large Files Line-by-Line
 
 ```nu
-# ❌ Loads entire file into memory
-open large.log | lines | where {$in =~ "ERROR"}
-
-# ✅ Streams line-by-line
-open large.log | lines | each --flatten {|line|
-    if ($line =~ "ERROR") {$line}
-}
+# Stream bytes from the file, split into lines, and stop after 20 matches
+open --raw large.log | lines | where {$in =~ "ERROR"} | first 20
 ```
 
 ### Batched Processing
 
 ```nu
 # Process in chunks of 1000
-open large.csv | chunks 1000 | each {|batch|
+open --raw large.csv | from csv | chunks 1000 | each --flatten {|batch|
     $batch | process-batch
-} | flatten
+}
 ```
 
+Here `process-batch` is a custom command returning rows for each batch.
+
 ## Advanced Glob Patterns
+
+These examples use the default 0.117 `glob` engine (Wax). With the experimental
+[`dc-glob`](https://www.nushell.sh/blog/2026-11-09-nushell_v0_117_0.html#dc-glob-follows-nu-glob-s-rules-in-every-command-with-a-b-added)
+option enabled, `glob` uses the same engine as `ls`, and Wax-specific repeat
+patterns such as `<a*:3>` no longer work.
 
 ### Combining Multiple Patterns
 
@@ -341,8 +377,8 @@ glob **/package.json --exclude [**/node_modules/**] --depth 5
 let value = "hello"
 metadata $value | get span
 
-# Preserve metadata through transformations
-$value | str upcase  # Metadata preserved
+# Inspect pipeline metadata such as the source path
+open --raw data.txt | metadata
 ```
 
 ### Building Structured Output
