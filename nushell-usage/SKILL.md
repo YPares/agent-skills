@@ -385,6 +385,7 @@ For advanced patterns and deeper dives, see:
 
 - **[references/advanced-patterns.md](references/advanced-patterns.md)** - Performance optimization, lazy evaluation, streaming, closures, memory-efficient patterns
 - **[references/type-system.md](references/type-system.md)** - Type annotations, aliases, conversions, and type guards
+- **[references/tui.md](references/tui.md)** - Build and test terminal pickers, forms, and live views with the built-in `tui` commands (0.116+)
 
 ## Best Practices
 

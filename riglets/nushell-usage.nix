@@ -26,8 +26,7 @@ in
         "Writing Nushell scripts or libraries"
         "Working with Nushell's type system, pipelines, and data structures"
         "Working with structured data in shells"
-        "Understanding Nushell type system"
-        "Advanced shell scripting patterns"
+        "Building TUIs with Nushell"
       ];
       keywords = [
         "nushell"
