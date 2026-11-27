@@ -17,7 +17,7 @@ in
   };
 
   config.riglets.nushell-usage = {
-    tools.unwrapped = [ pkgs.nushell ];
+    tools.unwrapped = [ cfg.nushellPkg ];
 
     meta = {
       description = "Essential patterns, idioms, and gotchas for writing Nushell code.";
